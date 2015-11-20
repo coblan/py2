@@ -42,9 +42,9 @@ class Sqlite(object):
         querystr += " FROM %s %s"%( model.__name__,condition_str)
         return querystr
     
-    @staticmethod
-    def connection():
-        return sqlite3.connect(':memory:')  
+    #@staticmethod
+    #def connection():
+        #return sqlite3.connect(':memory:')  
     
     @staticmethod
     def create(table):
@@ -84,7 +84,6 @@ class Meta(type):
 
 class Model(object):
     __metaclass__=Meta
-    connection=None
     db=Sqlite
     # 添加一个自增
     id = AutoIncrement()
@@ -98,11 +97,12 @@ class Model(object):
         cls.cursor.execute(querystr)  
         
     @classmethod
-    def connection(cls,conn=None):
-        if conn:
-            cls.conn=conn
-        else:
-            cls.conn=cls.db.connection()
+    def connection(cls,conn):
+        #if conn:
+            #cls.conn=conn
+        #else:
+            #cls.conn=cls.db.connection()
+        cls.conn = conn
         cls.cursor = cls.conn.cursor()
         
     @classmethod
@@ -152,8 +152,12 @@ class Model(object):
                 setattr(item,k,row[cnt])
                 cnt+=1
             yield item
-
-
+    
+    @classmethod
+    def clear(cls):
+        cursor = cls.conn.cursor()
+        cursor.execute("DELETE FROM "+cls.__name__)
+        Model.currentid = None
     
 #-------------test-------------
 if __name__ == '__main__':
@@ -161,24 +165,27 @@ if __name__ == '__main__':
     class test(Model):
         name = Field()
         age = Field()
-        
-    test.connection()
+    conn = sqlite3.connect(':memory:')  
+    test.connection(conn)
     test.create()
     
     tt = test()
     tt.name='heyulin'
     tt.age = 34
-    test(name='heyulin',age='18').save()
     tt.save()
     t2 = test(**{"name":'haha',"age":2000})
     t2.save()
+    
     print(t2.name)
     print(t2.id)
-    t2.name = 'dog'
-    t2.save()
-    print(t2.id)
     
-    for i in test.select("WHERE id='3'"):
-        print(i.name)
+    test.clear()
+    tt = test()
+    tt.name='heyulin'  
+    tt.save()
+    print(tt.id)
+    
+    #for i in test.select("WHERE id='3'"):
+        #print(i.name)
     #for i in test.select("WHERE name='heyulin'"):
         #print(i.age)

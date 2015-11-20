@@ -21,24 +21,44 @@ class EmployModel(Model):
     status = Field()
     work_type = Field()
     work_shift = Field()
-    expect_days = Field()
+    #expect_days = Field()
     startjob = Field()
     startmokie = Field()
     
-EmployModel.connection(sqlite3.connect("tmpfiles/employee"))
+#EmployModel.connection(sqlite3.connect("tmpfiles/employee"))
 class TmsData(object):
+    
+    @staticmethod
+    def loadFromExcel():
+        EmployModel.connection(sqlite3.connect(":memory:"))
+        EmployModel.create()
+        wb=openpyxl.load_workbook("employee.xlsx")
+        ws= wb.active
+        head=True
+        for i in ws.rows:
+            if head:  
+                head =False
+                continue  
+            ls = [j.value for j in i]
+            EmployModel(empid=ls[0],kao_number=ls[1],name=ls[2],pname=ls[3],status=ls[4],work_type=ls[5],
+                        work_shift=ls[6],startjob=ls[7],startmokie=ls[8]).save()
+        EmployModel.commit()
+        
     @staticmethod
     def employee():
         "罗列出雇员"
         for p in EmployModel.select():
-            if p.empid =='AE1774':
-                p.kao_number = 1157
-                p.save()
-            elif p.empid == 'AE1776':
-                p.kao_number= 1158 
-                p.save()
+            #if p.empid =='AE1774':
+                #p.kao_number = 1157
+                #p.save()
+            #elif p.empid == 'AE1776':
+                #p.kao_number= 1158 
+                #p.save()
             yield p  
-        EmployModel.commit()
+        #EmployModel.commit()
+if __name__ !="__main__":
+    TmsData.loadFromExcel()
+
 
 def geninfo():
     "直接运行该函数，将解析xlsx与xls文件，将生成一个列表，并保存到硬盘，目的是将empID同kao_number对应起来。"
@@ -52,7 +72,7 @@ def geninfo():
     
     '从excel提取员工信息，保存为pickle格式，作为测试用'
 
-    
+    EmployModel.connection(conn)
     EmployModel.create()
     
     wb = openpyxl.load_workbook(r"D:\work\attendance\MK_HR_Attendance Report_Cecilia_201510.xlsx")
@@ -65,14 +85,11 @@ def geninfo():
             continue
         ls = [j.value for j in i]
         kao_number='000'
-        #for i in  cursor.execute("SELECT * FROM raw_record WHERE name='%s'"%ls[1]):
         for i in Raw_Record.select("WHERE name='%s'"%ls[1]):
             kao_number = i.kao_number
             break
-        EmployModel(empid=ls[0],kao_number=kao_number,name=ls[1],pname=ls[2],status=ls[3],work_type=ls[4],work_shift=ls[5],expect_days=ls[6]).save()
-        #ls.append(kao_number)
-        
-        #out.append(ls)
+        EmployModel(empid=ls[0],kao_number=kao_number,name=ls[1],pname=ls[2],status=ls[3],work_type=ls[4],work_shift=ls[5]).save()
+
     EmployModel.commit()
     
     wb2 = openpyxl.load_workbook(r"D:\work\attendance\MK_HR_Leave Record2015_TEST.xlsx")
@@ -92,6 +109,14 @@ def geninfo():
             i.save()
             
     EmployModel.commit()
+    
+    wb2= openpyxl.Workbook()
+    ws = wb2.active
+    ws.append(["empid","kao qin number","name","pin yin name","status","work type","work shift","work experience","mokie experience"])
+    for row in EmployModel.select("ORDER BY empid"):
+        assert isinstance(row,EmployModel)
+        ws.append([row.empid,row.kao_number,row.name,row.pname,row.status,row.work_type,row.work_shift,row.startjob,row.startmokie])
+    wb2.save("employee.xlsx")
             
 if __name__ =='__main__':
     geninfo()

@@ -22,7 +22,7 @@ class Time(object):
     @staticmethod
     def strptime(str_):
         if not str_:
-            return ''
+            return Time(0)
         tm = Time(0)
         ls= str_.split(":")
         if ls:
@@ -62,7 +62,10 @@ class Time(object):
         return Time(hour,minute)
     
     def __str__(self):
-        return '%s:%02d:00'%(self.hour,self.minute)
+        if self.hour==0 and self.minute == 0:
+            return ""
+        else:
+            return '%s:%02d:00'%(self.hour,self.minute)
     
     def __add__(self,other):
         hour = self.hour+other.hour
