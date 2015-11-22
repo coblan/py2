@@ -41,10 +41,13 @@ class Name(object):
     def __get__(self,obj,tp =None):
         print(self,obj,tp)
         return self.val
+    def tostr(self,obj):
+        return obj
 
 class person(object):
     name = Name()
 
+print(person.name)
 p = person()
 p.name='haha'
 
