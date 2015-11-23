@@ -7,23 +7,24 @@
 
 
 import openpyxl,pickle
-from attend_reader import Raw_Record
-from orm import Model,Field
+#from attend_reader import Raw_Record
+from orm.model import Model
+from orm.fields import CharField
 import sqlite3
 
 
 class EmployModel(Model):
     "雇员的信息，当前信息来源于从excel提取出的固定信息"
-    empid = Field()
-    kao_number = Field()
-    name = Field()
-    pname =Field()
-    status = Field()
-    work_type = Field()
-    work_shift = Field()
+    empid = CharField(default='')
+    kao_number = CharField(default='')
+    name = CharField(default='')
+    pname =CharField(default='')
+    status = CharField(default='')
+    work_type = CharField(default='')
+    work_shift = CharField(default='')
     #expect_days = Field()
-    startjob = Field()
-    startmokie = Field()
+    startjob = CharField(default='')
+    startmokie = CharField(default='')
     
 #EmployModel.connection(sqlite3.connect("tmpfiles/employee"))
 class TmsData(object):
@@ -40,7 +41,7 @@ class TmsData(object):
                 head =False
                 continue  
             ls = [j.value for j in i]
-            EmployModel(empid=ls[0],kao_number=ls[1],name=ls[2],pname=ls[3],status=ls[4],work_type=ls[5],
+            EmployModel(empid=ls[0],kao_number=str(ls[1]),name=ls[2],pname=ls[3],status=ls[4],work_type=ls[5],
                         work_shift=ls[6],startjob=ls[7],startmokie=ls[8]).save()
         EmployModel.commit()
         
@@ -55,7 +56,19 @@ class TmsData(object):
                 #p.kao_number= 1158 
                 #p.save()
             yield p  
-        #EmployModel.commit()
+    
+    @staticmethod
+    def from_kaonumber(kao_number):
+        for p in EmployModel.select("WHERE kao_number='%s'"%kao_number):
+            return p
+    @staticmethod
+    def kao2workshift(kao_number):
+        person = TmsData.from_kaonumber(kao_number)
+        if person:
+            return person.work_shift
+        else:
+            return ''
+        
 if __name__ !="__main__":
     TmsData.loadFromExcel()
 

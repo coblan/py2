@@ -5,6 +5,7 @@ from mytime import Time,MyTimeField
 from datetime import datetime,date,timedelta
 from orm.model import Model
 from orm.fields import CharField,DateField,DateField
+import kaoqin
 
 # TMS模拟数据
 from tms import TmsData
@@ -16,7 +17,7 @@ def pre_process(path):
     return RecordModel.get_days()
 
 def process(daysettings,path):
-    RecordModel.setdaystn(daysettings)
+    RecordModel.setdaystn(daysettings)     
     RecordModel.main_process()
     RecordModel.overtime_bonus()
     RecordModel.gen07(path)
@@ -142,14 +143,14 @@ class RecordModel(Model):
             # 必须先添加workshift，因为后面属性计算会用到
             p.workshift = TmsData.kao2workshift(p.kao_number)
 
-            p.note = p.get_note()
-            p.sub_sequence = p.get_sub_sequence()
+            p.note = kaoqin.get_note(p.date, p.daystn, p.workstart, p.workleave)
+            p.sub_sequence = kaoqin.get_sub_sequence(p.date,p.daystn,p.workstart,p.workleave)
 
-            p.late_team = p.get_late_team()
-            p.workspan= p.get_workspan() 
-            p.late_person = p.get_late_person()
-            p.overtime= p.get_over_time()
-            p.early_leave = p.get_early_leave()
+            p.late_team = kaoqin.get_late_team(p.date,p.daystn,p.workstart)
+            p.workspan= kaoqin.get_workspan(workstart,workleave) 
+            p.late_person = kaoqin.get_late_person(p.date,p.workstart)
+            p.overtime= kaoqin.get_over_time(p.date,p.workleave)
+            p.early_leave = kaoqin.get_early_leave(p.date,p.daystn,p.workstart)
             
             p.save()
        
@@ -161,7 +162,7 @@ class RecordModel(Model):
         overtimelist = []
         for p in RecordModel.select():
             assert isinstance(p,RecordModel)
-            overtime = p.overtime #Time.strptime(p.overtime)
+            overtime = p.overtime 
             if overtime!=Time(0) and p.note !="restday":
                 overtimelist.append(p)
         
@@ -196,148 +197,8 @@ class RecordModel(Model):
         
         wb.save(path)
 
-    def day_type(self):
-        datestr = self.date.strftime("%Y/%m/%d")
-        for k,v in self.daystn.items():
-            if k =='time':
-                continue
-            elif k=='restday':
-                if datestr in v:
-                    return "restday"
-            elif datestr in v:
-                return k
-        raise ValueError("which type %s should be?"%self.date)    
+ 
 
-    def sud_start(self):
-        day = self.day_type()
-        if day=="workday":
-            mt = re.match(r"(.*)-(.*)",self.workshift)
-            if mt:
-                return Time.strptime(mt.group(1))
-            else:
-                return Time(0)
-        elif day == "restday":
-            return Time(0)
-        else:
-            return Time.strptime(self.daystn["time"][day][0])
-    
-    def get_workspan(self):
-        if self.workstart == Time(0):
-            return Time(0)
-        elif self.workstart == self.workleave:
-            return Time(0)
-        else:
-            if self.workstart <=Time(12,30):
-                morning = Time(12,30)-self.workstart
-                afternoon = self.workleave - Time(13,30)
-                return morning+afternoon
-            elif self.workstart >Time(1,30):
-                return self.workleave - self.workstart
-            else:
-                return self.workleave -Time(1,30)
-           
-    
-    def get_note(self):
-        if self.day_type() =="restday":
-            return "restday"
-        elif self.workstart==Time(0) and self.sud_start()!= Time(0):
-            return "not work"
-        elif self.workstart != Time(0) and self.workstart == self.workleave:
-            return 'single'  
-        else:
-            return ''
-            
-    def get_sub_sequence(self,tic=None):
-        "迟到标记：late1 迟到<15分钟，late2:迟到<1个小时，late3:迟到<2个小时,late4:迟到>2个小时"
-        if self.day_type() == "restday":
-            return ''
-        elif self.workleave == self.workstart:
-            return ''
-        workstart = self.workstart 
-        sud_start = self.sud_start()
-        if sud_start == Time(0):
-            return ''
-        elif tic is None:
-            tic= sud_start   
-            
-        if tic< workstart <=tic+Time(0,15):
-            return 'late1'
-        elif tic+Time(0,15) <= workstart <tic+Time(1):
-            return 'late2'
-        elif tic+Time(1) <= workstart< tic+Time(2):
-            return 'late3' 
-        elif tic <= workstart:
-            return 'late4'
-        else:
-            return ''
-   
-
-    def get_late_team(self,tic=None):
-        '返回迟到团队时间，Time对象'
-        if self.day_type()=="restday":
-            return ''
-        workstart = self.workstart 
-        sud_start = self.sud_start()
-        if sud_start ==Time(0):
-            return Time(0)
-        elif tic is None:
-            tic= sud_start
-            
-        late = workstart - (tic+Time(0,15))
-        return late      
-    
-    def get_late_person(self,tic=None):
-        if self.day_type()== "restday":
-            return ''
-        workstart = self.workstart 
-        sud_start = self.sud_start()
-        if sud_start== Time(0):
-            return Time(0)
-        elif tic is None:
-            tic= sud_start  
-            
-        if tic+Time(0,15) <=workstart <tic+Time(1):
-            return workstart-(tic+Time(0,15) )
-        elif tic+Time(1)<= workstart <tic+Time(2):
-            return (workstart- (tic+Time(0,15)))*2  
-        elif tic +Time(2)<=workstart:
-            return (workstart- (tic+Time(0,15)))*3
-        else:
-            return ''
-
-
-    def get_over_time(self):
-        day = self.day_type()
-        if day != "restday":
-            return self.workleave-Time(20)
-        else:
-            return Time(0)
-    
-    def get_early_leave(self):
-        if self.day_type()=="restday":
-            return '' 
-        workleave = self.workleave 
-        if workleave ==Time(0):
-            return ''
-        sud_leave = self.sud_leave()
-        if sud_leave ==Time(0):
-            return ''
-        else:
-            return sud_leave-workleave
-
-
-    def sud_leave(self):
-        day = self.day_type()
-        if day=="workday":
-            mt = re.match(r"(.*)-(.*)",self.workshift)
-            if mt:
-                return Time.strptime(mt.group(2))
-            else:
-                return Time(0)
-        elif day=="restday":
-            return Time(0)
-        else:
-            return Time.strptime(self.daystn["time"][day][1])
         
 
 if __name__ == '__main__':

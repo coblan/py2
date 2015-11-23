@@ -1,6 +1,6 @@
 # -*- encoding:utf8 -*-
 
-from heStruct.orm.fields import CharField
+from orm.fields import CharField
 class Time(object):
     """
     由于python标准库的datetime.time运算不方面，所以这里简单的实现了time的计算功能。
