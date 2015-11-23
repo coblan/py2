@@ -103,17 +103,3 @@ class DateField(CharField):
         else:
             raise ValueError("DateField need assign @date or @date_string or @None")
 
-from heOs.mytime import Time  
-class MyTimeField(CharField):
-    def todb(self, obj):
-        if obj is None:
-            return "NULL"
-        assert isinstance(obj,Time)
-        return "'%s'"%str(obj)
-    def __set__(self, obj, val):
-        if val is None or isinstance(val,Time):
-            setattr(obj,"_field%s"%self.cnt,val)
-        elif isinstance(val,(str,unicode)):
-            setattr(obj,"_field%s"%self.cnt,Time.strptime(val))
-        else:
-            raise ValueError("MYTimeField set erro")

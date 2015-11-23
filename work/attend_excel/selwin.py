@@ -46,8 +46,8 @@ class ManulWin(QWidget,Ui_Form):
                 restday.append(d)
             else:
                 workday.append(d)
-        workday = [x.strftime("%Y/%m/%d") for x in workday]
-        restday = [x.strftime("%Y/%m/%d") for x in restday]
+        #workday = [x.strftime("%Y/%m/%d") for x in workday]
+        #restday = [x.strftime("%Y/%m/%d") for x in restday]
         dc = {"time":{"workday":("8:30","17:30"),
                       "special":("10:00","17:30")
                       },

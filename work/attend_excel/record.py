@@ -2,29 +2,31 @@
 import xlrd
 from openpyxl import Workbook
 from openpyxl.styles import PatternFill,Style,Color
-from mytime import Time
+from mytime import Time,MyTimeField
 import sqlite3
 from datetime import datetime,date,timedelta
-from orm import Model,Field
+#from orm import Model,Field
+from heStruct.orm.model import Model
+from heStruct.orm.fields import CharField,DateField,DateField
 from tms import TmsData
 import re
 
 class RecordModel(Model): 
     "整理后的考勤记录数据表"
-    kao_number=Field()
-    name = Field()
-    department = Field()
-    date = Field()
-    workshift = Field()
-    workstart = Field()
-    workleave = Field()
-    note = Field()
-    sub_sequence = Field()
-    late_team = Field()
-    workspan = Field()
-    late_person=Field()
-    overtime =Field()
-    early_leave = Field()
+    kao_number=CharField(default='')
+    name = CharField(default='')
+    department = CharField(default='')
+    date = DateField(default='')
+    workshift = CharField(default='')
+    workstart = MyTimeField(default='')
+    workleave = MyTimeField(default='')
+    note = CharField(default='')
+    sub_sequence = CharField(default='')
+    late_team = MyTimeField(default='')
+    workspan = MyTimeField(default='')
+    late_person=MyTimeField(default='')
+    overtime =MyTimeField(default='')
+    early_leave = MyTimeField(default='')
 
     
 class Record(object):
@@ -41,7 +43,7 @@ class Record(object):
         for p in RecordModel.select():
             days.append(p.date)
         days =list(set(days))
-        days = [datetime.strptime(x,"%Y/%m/%d").date() for x in days]
+        #days = [datetime.strptime(x,"%Y/%m/%d").date() for x in days]
         days.sort()
         return days
     
