@@ -117,15 +117,15 @@ if __name__ == '__main__':
         name = CharField()
         age = IntField()
         birthday = DateField(NULL=True)
-        time = MyTimeField(NULL=True)
+        #time = MyTimeField(NULL=True)
     conn = sqlite3.connect(':memory:')  
     #conn = sqlite3.connect('dog.db') 
     test.connection(conn)
     test.create()
     
-    tt = test()
-    tt.name="he'yulin"
-    tt.age = 34
+    dc = {"name":'heyulin',"age":34}
+    tt = test(**dc)
+
     tt.birthday=datetime.today().date()
     tt.time = Time(5,10)
     tt.save()

@@ -85,7 +85,7 @@ class MyTimeField(CharField):
     def todb(self, obj):
         if obj is None:
             return "NULL"
-        #assert isinstance(obj,Time)
+        assert isinstance(obj,Time)
         return "'%s'"%str(obj)
     def __set__(self, obj, val):
         if val is None or isinstance(val,Time):

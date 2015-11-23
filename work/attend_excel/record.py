@@ -18,15 +18,15 @@ class RecordModel(Model):
     department = CharField(default='')
     date = DateField(default='')
     workshift = CharField(default='')
-    workstart = MyTimeField(default='')
-    workleave = MyTimeField(default='')
+    workstart = MyTimeField(default=Time(0))
+    workleave = MyTimeField(default=Time(0))
     note = CharField(default='')
     sub_sequence = CharField(default='')
-    late_team = MyTimeField(default='')
-    workspan = MyTimeField(default='')
-    late_person=MyTimeField(default='')
-    overtime =MyTimeField(default='')
-    early_leave = MyTimeField(default='')
+    late_team = MyTimeField(default=Time(0))
+    workspan = MyTimeField(default=Time(0))
+    late_person=MyTimeField(default=Time(0))
+    overtime =MyTimeField(default=Time(0))
+    early_leave = MyTimeField(default=Time(0))
 
     
 class Record(object):
@@ -92,14 +92,15 @@ class Record(object):
         for p in RecordModel.select():
             self.crtperson = p
             
-            workstart = Time.strptime(p.workstart)
-            workleave = Time.strptime(p.workleave)           
+            workstart = p.workstart # Time.strptime(p.workstart)
+            workleave = p.workleave # Time.strptime(p.workleave)           
             # 修改字段
             # 为了给日期补0
-            p.date = datetime.strptime(p.date,"%Y/%m/%d").date().strftime("%Y/%m/%d")
-            if self.get_workday() is None:
+            
+            #p.date = datetime.strptime(p.date,"%Y/%m/%d").date().strftime("%Y/%m/%d")
+            if self.get_workday() =="restday":
                 p.note="restday"
-            elif self.crtperson.workstart=="" and self.get_sud_start() is not None:
+            elif self.crtperson.workstart==Time(0) and self.get_sud_start()!= Time(0):
                 p.note="not work"
                 
           
@@ -135,7 +136,8 @@ class Record(object):
             #xia =self.xia_ban_color()
 
             # 整理格式准备写入excel2007
-            outrow=[row.kao_number,row.name,row.department,row.date,row.workshift,row.workstart,row.workleave,row.note,row.sub_sequence,row.late_team,row.workspan,row.late_person,row.overtime,row.early_leave]
+            outrow=[row.kao_number,row.name,row.department,row.date.strftime("%Y/%m/%d"),row.workshift,row.workstart,row.workleave,row.note,row.sub_sequence,row.late_team,row.workspan,row.late_person,row.overtime,row.early_leave]
+            outrow = [ str(x) for x in outrow]
             ws.append(outrow)  
 
             #添加颜色【1】
@@ -157,12 +159,12 @@ class Record(object):
         overtimelist = []
         for p in RecordModel.select():
             assert isinstance(p,RecordModel)
-            overtime = Time.strptime(p.overtime)
+            overtime = p.overtime #Time.strptime(p.overtime)
             if overtime!=Time(0):
                 overtimelist.append(p)
         
         for p in overtimelist:
-            date = datetime.strptime(p.date,"%Y/%m/%d").date()
+            date = p.date #datetime.strptime(p.date,"%Y/%m/%d").date()
             #self.crtperson = p
             if date.weekday()!=4:
                 lastday = date + timedelta(days=1)
@@ -185,58 +187,66 @@ class Record(object):
         RecordModel.commit()
     
     def get_workday(self):
+        datestr = self.crtperson.date.strftime("%Y/%m/%d")
         for k,v in self.daysettings.items():
             if k =='time':
                 continue
             elif k=='restday':
-                if self.crtperson.date in v:
-                    return None
-            elif self.crtperson.date in v:
+                if datestr in v:
+                    return "restday"
+            elif datestr in v:
                 return k
         raise ValueError("which type %s should be?"%self.crtperson.date)
                 
     def get_sud_start(self):
         workday = self.get_workday()
-        if workday:
-            if workday=="workday":
-                mt = re.match(r"(.*)-(.*)",self.crtperson.workshift)
-                if mt:
-                    return Time.strptime(mt.group(1))
+        if workday=="workday":
+            mt = re.match(r"(.*)-(.*)",self.crtperson.workshift)
+            if mt:
+                return Time.strptime(mt.group(1))
             else:
-                return Time.strptime(self.daysettings["time"][workday][0])
-        return None
+                return Time(0)
+        elif workday == "restday":
+            return Time(0)
+        else:
+            return Time.strptime(self.daysettings["time"][workday][0])
+
                    
     def get_sud_leave(self):
         workday = self.get_workday()
-        if workday:
-            if workday=="workday":
-                mt = re.match(r"(.*)-(.*)",self.crtperson.workshift)
-                if mt:
-                    return Time.strptime(mt.group(2))
+        #if workday:
+        if workday=="workday":
+            mt = re.match(r"(.*)-(.*)",self.crtperson.workshift)
+            if mt:
+                return Time.strptime(mt.group(2))
             else:
-                return Time.strptime(self.daysettings["time"][workday][1])
-        return None    
+                return Time(0)
+        elif workday=="restday":
+            return Time(0)
+        else:
+            return Time.strptime(self.daysettings["time"][workday][1])
+        #return None    
     
     def get_late_team(self,tic=None):
         'callback:返回迟到团队时间，Time对象'
-        if self.get_workday() is None:
+        if self.get_workday()=="restday":
             return ''
-        workstart = Time.strptime(self.crtperson.workstart)
+        workstart = self.crtperson.workstart #Time.strptime(self.crtperson.workstart)
         if tic is None:
             tic= self.get_sud_start()
-            if tic is None:
+            if tic ==Time(0):
                 return ''
         late = workstart - (tic+Time(0,15))
         return late        
 
 
     def get_sub_sequence(self,tic=None):
-        if self.get_workday() is None:
+        if self.get_workday() == "restday":
             return ''
-        workstart = Time.strptime(self.crtperson.workstart)
+        workstart = self.crtperson.workstart #Time.strptime(self.crtperson.workstart)
         if tic is None:
             tic= self.get_sud_start()
-            if tic is None:
+            if tic == Time(0):
                 return ''            
         if tic< workstart <=tic+Time(0,15):
             return 'late1'
@@ -249,12 +259,12 @@ class Record(object):
         
 
     def get_late_person(self,tic=None):
-        if self.get_workday() is None:
+        if self.get_workday()== "restday":
             return ''
-        workstart = Time.strptime(self.crtperson.workstart)
+        workstart = self.crtperson.workstart #Time.strptime(self.crtperson.workstart)
         if tic is None:
             tic= self.get_sud_start()
-            if tic is None:
+            if tic == Time(0):
                 return ''          
         if tic+Time(0,15) <=workstart <tic+Time(1):
             return workstart-(tic+Time(0,15) )
@@ -264,17 +274,17 @@ class Record(object):
             return ''
         
     def get_over_time(self):
-        workleave = Time.strptime(self.crtperson.workleave)
+        workleave = self.crtperson.workleave #Time.strptime(self.crtperson.workleave)
         return workleave-Time(20)
     
     def get_early_leave(self):
-        if self.get_workday() is None:
+        if self.get_workday()=="restday":
             return '' 
-        workleave = Time.strptime(self.crtperson.workleave)
+        workleave = self.crtperson.workleave #Time.strptime(self.crtperson.workleave)
         if workleave ==Time(0):
             return ''
         sud_leave = self.get_sud_leave()
-        if sud_leave is None:
+        if sud_leave ==Time(0):
             return ''
         else:
             return sud_leave-workleave
