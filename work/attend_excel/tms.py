@@ -7,7 +7,7 @@
 
 
 import openpyxl,pickle
-from attend_reader import Raw_Record
+
 from orm import Model,Field
 import sqlite3
 
@@ -119,4 +119,5 @@ def geninfo():
     wb2.save("employee.xlsx")
             
 if __name__ =='__main__':
+    from attend_reader import Raw_Record
     geninfo()
