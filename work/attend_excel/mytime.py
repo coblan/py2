@@ -78,7 +78,9 @@ class Time(object):
     def __eq__(self,other):
         assert isinstance(other,Time)
         return self.hour == other.hour and self.minute == other.minute
-        
+    
+    def __repr__(self):
+        return "<myTime(%s,%s)>"%(self.hour,self.minute)
 
 
 class MyTimeField(CharField):
