@@ -7,15 +7,10 @@
 
 
 import openpyxl,pickle
-<<<<<<< .mine
 
-from orm import Model,Field
-
-=======
 #from attend_reader import Raw_Record
 from orm.model import Model
 from orm.fields import CharField
->>>>>>> .theirs
 import sqlite3
 
 
