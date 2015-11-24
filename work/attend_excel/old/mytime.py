@@ -1,7 +1,20 @@
 # -*- encoding:utf8 -*-
 
 class Time(object):
-    '时间运算，转换。'
+    """
+    由于python标准库的datetime.time运算不方面，所以这里简单的实现了time的计算功能。
+    
+    两个方式生成Time对象
+    ========================
+    1.构造函数： obj=Time(8,45)
+    2.字符串 : obj= Time.strptime("8:45")
+    
+    操作
+    ========================
+    实现了 + ,- ,* ,排序比较 ，str()
+    
+    存放数据库时使用字符串保存,如str(timeobj)
+    """
     def __init__(self,hour,minute=0):
         self.hour=hour
         self.minute =minute
@@ -9,7 +22,7 @@ class Time(object):
     @staticmethod
     def strptime(str_):
         if not str_:
-            return ''
+            return Time(0)
         tm = Time(0)
         ls= str_.split(":")
         if ls:
@@ -49,7 +62,10 @@ class Time(object):
         return Time(hour,minute)
     
     def __str__(self):
-        return '%s:%02d:00'%(self.hour,self.minute)
+        if self.hour==0 and self.minute == 0:
+            return ""
+        else:
+            return '%s:%02d:00'%(self.hour,self.minute)
     
     def __add__(self,other):
         hour = self.hour+other.hour
@@ -58,6 +74,11 @@ class Time(object):
         minute = minute%60
         return Time(hour,minute)
     
-    #def to_stdtime(self):
-        #hour =self.hour%24
-        #return time(hour,self.minute)
+    def __eq__(self,other):
+        assert isinstance(other,Time)
+        return self.hour == other.hour and self.minute == other.minute
+    
+    def __repr__(self):
+        return "<myTime(%s,%s)>"%(self.hour,self.minute)
+
+

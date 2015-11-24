@@ -1,73 +1,103 @@
 # -*- encoding:utf8 -*-
+# 生成考勤记录统计
+#
+#
 from mytime import Time
 from openpyxl.styles import PatternFill,Style,Color
 from settings import *
+from attend_reader import Raw_Record
+from orm import Model,Field
+from tms import TmsData
+from datetime import datetime,timedelta,date
+
+
+class RecordModel(Model): 
+    "整理后的考勤记录数据表"
+    kao_number=Field()
+    name = Field()
+    department = Field()
+    date = Field()
+    workstart = Field()
+    workleave = Field()
+    note = Field()
+    sub_sequence = Field()
+    late_team = Field()
+    workspan = Field()
+    late_person=Field()
+    overtime =Field()
+
 
 class Record(object):
-    """
-    0:kao_number,8:team_late,9:workspan
-    10:person_late
-    11:over_time
-    """
-    def __init__(self,conn):
-        self.conn =conn
+    def __init__(self):
+        self.crtperson = None
         
-    def parse(self):
-        record_cursor= self.conn.cursor()
-        record_cursor.execute('''CREATE TABLE record
-                             (kao_number text, name text, department text, date text, workstart text, workleave text,
-                             note text, sub_sequence text,team_late text,workspan text,person_late text,over_time text)''') 
-        raw_cursor = self.conn.cursor()
-        for row in raw_cursor.execute("""SELECT * FROM raw_record"""):
-            personId=row[0]
-
+    
+    def gen_table(self,conn):
+        "在conn中生成处理的考勤记录表,表模型见RecordModel"
+        RecordModel.connection(conn)
+        RecordModel.create()
+        
+        for row in Raw_Record.select():
+            self.crtperson = row
+            
+            workstart = Time.strptime(row.workstart)
+            workleave = Time.strptime(row.workleave)           
             # 输出字段
-            kao_number= row[0]
-            name = row[1]
-            department = row[2]
-            date = row[3]
-            workstart = Time.strptime(row[4])
-            workleave = Time.strptime(row[5])
-            note = ''
-            sub_sequence = self.get_sub_sequence(workstart,personId)
-            team_late = self.get_team_late(workstart,personId)
-            workspan= (workleave- workstart-Time(1) ) if isinstance(workleave,Time) else ""
-            person_late = self.get_person_late(workstart,personId)
-            over_time= self.get_over_time(workstart,workleave,personId)
-
-            outrow = (kao_number,name,department,date,str(workstart),str(workleave),note,sub_sequence,str(team_late),str(workspan),str(person_late),str(over_time))
-            record_cursor.execute("INSERT INTO record VALUES ('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')"%outrow)
-
-        self.conn.commit()   
-        return self
+            RecordModel(
+                kao_number= row.kao_number,
+                name = row.name,
+                department = row.department,
+                date = datetime.strptime(row.date,"%Y/%m/%d").date().strftime("%Y/%m/%d"),
+                workstart = workstart,
+                workleave = workleave,
+                note = '',
+                sub_sequence = self.get_sub_sequence(),
+                late_team = self.get_late_team(),
+                workspan= (workleave- workstart-Time(1) ) if isinstance(workleave,Time) else "",
+                late_person = self.get_late_person(),
+                overtime= self.get_over_time(),
+                ).save()
+ 
+        RecordModel.commit()
+        
+        overtimelist = []
+        for p in RecordModel.select():
+            assert isinstance(p,RecordModel)
+            overtime = Time.strptime(p.overtime)
+            if overtime!=Time(0):
+                overtimelist.append(p)
+        
+        for p in overtimelist:
+            date = datetime.strptime(p.date,"%Y/%m/%d").date()
+            self.crtperson = p
+            if date.weekday()!=4:
+                lastday = date + timedelta(days=1)
+                laststr = lastday.strftime("%Y/%m/%d")
+                for i in RecordModel.select("WHERE date='%s' AND kao_number='%s'"%(laststr,p.kao_number)):
+                    i.late_team= self.get_late_team(tic=Time(10))
+                    i.late_person = self.get_late_person(tic=Time(10))
+                    i.sub_sequence = self.get_sub_sequence(Time(10))
+                    i.save()
+                    break
+                
     
     def gen07(self,ws):
         ws.title='record'
         ws.append([u"考勤号码",u"姓名",u"部门",u"日期",u"上班时间",u"下班时间",u'Note',u'sub-sequence',u'迟到时长-团队',u'工作时长',u'迟到时长-个人出勤率',u'加班时长'])
         
         cnt=1
-        record_cursor = self.conn.cursor()
-        #record_cursor.execute('''CREATE TABLE record
-                     #(kao_number text, name text, department text, date text, workstart text, workleave text,
-                     #note text, sub_sequence text,team_late text,workspan text,person_late text,over_time text)''')   
-        #raw_cursor = self.data.cursor()
-        for row in record_cursor.execute("""SELECT * FROM record"""):
+        for row in RecordModel.select():
             cnt+=1
-            personId=row[0]
-
-            # 输出字段
-            workstart = Time.strptime(row[4])
-            workleave = Time.strptime(row[5])
-
+            assert isinstance(row,RecordModel)
+            self.crtperson=row
 
             #判断添加cell颜色，要等待写入2007后，才能添加颜色，见【1】
-            shang=self.shang_ban_color(workstart)
-            xia =self.xia_ban_color(workleave)
+            shang=self.shang_ban_color()
+            xia =self.xia_ban_color()
 
             # 整理格式准备写入excel2007
-            #outrow = [kao_number,name,department,date,str(workstart),str(workleave),note,sub_sequence,str(team_late),str(workspan),str(person_late),str(over_time)]
-            #record_cursor.execute("INSERT INTO record VALUES ('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')"%tuple(outrow))
-            ws.append(row)  
+            outrow=[row.kao_number,row.name,row.department,row.date,row.workstart,row.workleave,row.note,row.sub_sequence,row.late_team,row.workspan,row.late_person,row.overtime]
+            ws.append(outrow)  
 
             #添加颜色【1】
             if shang:
@@ -75,43 +105,53 @@ class Record(object):
             if xia:
                 ws['F'+str(cnt)].fill=PatternFill(fill_type='solid', start_color=xia)      
         
-    def get_team_late(self,start,personId):
+        
+    def get_late_team(self,tic=Time(8,30)):
         'callback:返回迟到团队时间，Time对象'
-        if isinstance(start,Time):
-            spot = Time(8,45)
-            late = start - spot
+        workstart = Time.strptime(self.crtperson.workstart)
+        if isinstance(workstart,Time):
+            late = workstart - (tic+Time(0,15))
             return late
-        else:
-            return ''
-
-    def get_sub_sequence(self,workstart,personId):
-        if workstart and isinstance(workstart,Time):
-            for k,v in late.items():
-                if v[0]<=workstart<=v[1]:
-                    return k
+        
         return ''
 
-    def get_person_late(self, workstart,personId):
-        late = self.get_sub_sequence(workstart,personId)
-        if  late== 'late2':
-            return workstart-Time(8,45)
-        elif late=='late3':
-            late = workstart -Time(8,45)
-            return late*2
-        else:
-            return Time(0)
-
-    def get_over_time(self,workstart, workleave,personId):
+    def get_sub_sequence(self,tic=Time(8,30)):
+        workstart = Time.strptime(self.crtperson.workstart)
         if isinstance(workstart,Time):
+            if tic< workstart <=tic+Time(0,15):
+                return 'late1'
+            elif tic+Time(0,15) <= workstart <tic+Time(1):
+                return 'late2'
+            elif tic+Time(1) <= workstart:
+                return 'late3'
+            #for k,v in lateLevel.items():
+                #if v[0]<=workstart<=v[1]:
+                    #return k
+        
+        return ''
+
+    def get_late_person(self,tic=Time(8,30)):
+        workstart = Time.strptime(self.crtperson.workstart)
+        if isinstance(workstart,Time):
+            if tic+Time(0,15) <=workstart <tic+Time(1):
+                return workstart-(tic+Time(0,15) )
+            elif tic+Time(1)<= workstart:
+                return (workstart- (tic+Time(1)))*2
+       
+        return Time(0)
+        
+
+    def get_over_time(self):
+        #workstart = Time.strptime(self.crtperson.workstart)
+        workleave = Time.strptime(self.crtperson.workleave)
+        if isinstance(workleave,Time):
             return workleave-Time(20)
         else:
             return Time(0)
 
 
-    def shang_ban_color(self,workstart):
-        if not workstart:
-            return
-        late = self.get_sub_sequence(workstart, personId=None)
+    def shang_ban_color(self):
+        late = self.crtperson.sub_sequence
         if late=='late3':
             return 'FFFFFF00'
         elif late == 'late2':
@@ -119,6 +159,5 @@ class Record(object):
         elif late == 'late1':
             return 'FFFFB5C5'
 
-    def xia_ban_color(self,workleave):
-        if workleave:
-            return        
+    def xia_ban_color(self):
+        pass       
