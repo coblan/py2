@@ -1,14 +1,12 @@
 # -*- encoding:utf8 -*-
+"""
+模拟TMS数据
+直接运行该文件，会运行geninfo()函数，其目的是从record,report提取雇员的信息，如雇员号，考勤号等，将模型EmployModel。最后保存为sqlite3文件
+该文件被别的模块调用时，主要调用TmsData.empoyee()生成器，其目的是罗列出雇员信息。
+EmployModel 当前雇员模型
 
-# 模拟TMS数据
-# 直接运行该文件，会运行geninfo()函数，其目的是从record,report提取雇员的信息，如雇员号，考勤号等，将模型EmployModel。最后保存为sqlite3文件
-# 该文件被别的模块调用时，主要调用TmsData.empoyee()生成器，其目的是罗列出雇员信息。
-# EmployModel 当前雇员模型
-
-
+"""
 import openpyxl,pickle
-
-#from attend_reader import Raw_Record
 from orm.model import Model
 from orm.fields import CharField
 import sqlite3
@@ -16,6 +14,7 @@ import sqlite3
 
 class EmployModel(Model):
     "雇员的信息，当前信息来源于从excel提取出的固定信息"
+    empid = CharField(default="")
     kao_number = CharField(default='')
     name = CharField(default='')
     pname =CharField(default='')

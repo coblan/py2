@@ -1,28 +1,15 @@
 # -*- encoding:utf8 -*-
-#
-# 调用Leave.gen_leavetb() 会在当前目录生成sqlite3格式的 tmpfiles/leave.db 文件，
-#
-from tms import TmsData,EmployModel
-from orm import Model,Field
-import sqlite3
+"""
+作用
+=================================
+计算当前年假的算法
+
+"""
 from datetime import date,datetime
 
-class LeaveModel(Model):
-    '暂存假期数据表'
-    empid = Field()
-    name = Field()
-    startjob = Field()
-    startmokie = Field()
-    total_year = Field()
-    mk_year = Field()
-    legal_al=Field()
-    comp_al=Field()
-    available_al=Field()
 
-LeaveModel.connection(sqlite3.connect("tmpfiles/leave.db"))
-LeaveModel.create()
 
-class Leave(object):
+class LeaveCompute(object):
     """
     年假规则：
     ===================
@@ -32,50 +19,54 @@ class Leave(object):
                          2. 1<= 工作年限 <10  , 7 天
                          3. 10<=工作年限 <20  , 10 天
                          4. 工作年限>=20 ,      15 天
-    公司年假(comp_al) = 摩奇工作年限
+    公司年假(mokie_al) = 摩奇工作年限
+    
+    调用函数获取年假
+    ==========================================
+    get_available_al()    获取当前规定可用年假，返回Int
+    get_legal_al()        获取当前法定可用年假，返回Int
+    get_mokieyear()       获取当前摩奇工作年限，返回Int
+    get_totalyear()       获取当前总的工作年限，返回Int
+
     """
+    def __init__(self,startjob,startmokie):
+        """
+        startjob:   开始工作的日期，格式："2010/11/09" 字符串
+        startmokie: 开始在摩奇上班的日期 ，格式："2010/11/09" 字符串
+        """
+        self.startjob = startjob
+        self.startmokie = startmokie
+        
+    def get_totalyear(self):
+        """
+        返回总的工作年限，int
+        """
+        startjob = datetime.strptime(self.startjob,"%Y/%m/%d")
+        return getyearspan(date.today(),startjob)
     
-    def gen_leavetb(self):
-        '生成假期表'
-        for p in TmsData.employee():
-            assert isinstance(p,EmployModel)
-            
-            try:
-                startjob = datetime.strptime(p.startjob,'%Y/%m/%d').date()
-                total_year = getyearspan(date.today(),startjob)
-            except ValueError:
-                total_year = 0
-            try:
-                startmokie = datetime.strptime(p.startmokie,"%Y/%m/%d").date()
-                mk_year = getyearspan(date.today(),startmokie)   
-            except ValueError:
-                mk_year = 0
-            legal_al = self.get_legal_al(total_year)
-            available_al = min(20,legal_al+mk_year)
-            LeaveModel(
-                empid = p.empid,
-                name = p.name,
-                startjob = p.startjob,
-                startmokie = p.startmokie,
-                total_year = total_year,
-                mk_year = mk_year ,  
-                legal_al = legal_al,
-                comp_al = mk_year,
-                available_al = available_al,
-            ).save()
-        LeaveModel.commit()
+    def get_mokieyear(self):
+        startmokie = datetime.strptime(self.startmokie,"%Y/%m/%d")
+        return getyearspan(date.today(),startmokie)
     
-    def get_legal_al(self,total_year):
-        '计算法定年假'
-        if total_year<1:
+    def get_legal_al(self):
+        """
+         计算法定年假
+        """
+        totalyear = self.get_totalyear()
+        if totalyear<1:
             return 0
-        elif 1<= total_year <10:
+        elif 1<= totalyear <10:
             return 7
-        elif 10<=total_year <20:
+        elif 10<=totalyear <20:
             return 10
         else:
-            return 15
-        
+            return 15    
+    def get_mokie_al(self):
+        return self.get_mokieyear()
+    
+    def get_available_al(self):
+        return min(20,self.get_legal_al()+self.get_mokie_al())
+   
 def getyearspan(date1,date2):
     "date1 later than date2"
     year = date1.year-date2.year
@@ -87,5 +78,9 @@ def getyearspan(date1,date2):
         return year -1
   
 if __name__ == '__main__':
-    Leave(). gen_leavetb()
-    
+    obj = LeaveCompute(startjob="2004/8/15", startmokie="2005/9/16")
+    print(obj.get_available_al())
+    print(obj.get_mokieyear())
+    print(obj.get_mokie_al())
+    print(obj.get_totalyear())
+    print(obj.get_legal_al())

@@ -13,7 +13,6 @@ class Time(object):
     ========================
     实现了 + ,- ,* ,排序比较 ，str()
     
-    存放数据库时使用字符串保存,如str(timeobj)
     """
     def __init__(self,hour,minute=0):
         self.hour=hour

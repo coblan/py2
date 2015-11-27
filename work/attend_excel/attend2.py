@@ -47,12 +47,12 @@ def get_attend_list(path):
                      [考勤号，名字，部门，日期，上班打卡时间，下班打卡时间]]
     path: 原始考勤记录03excel表
     """    
-    attendlist = read_raw_03(path)
+    attendlist = read_excel_03(path)
     attendlist = div_time_col(attendlist)   
     attendlist.sort(cmp=kaolist_cmp)
     return attendlist
 
-def read_raw_03(path):
+def read_excel_03(path):
     "读取原始考勤记录，不做任何处理"
     rawdata = xlrd.open_workbook(path,encoding_override='gbk')
     table = rawdata.sheets()[0]
@@ -94,6 +94,221 @@ def kaolist_cmp(x,y):
         xdate=datetime.strptime(x[3],"%Y/%m/%d").date()
         ydate=datetime.strptime(y[3],"%Y/%m/%d").date()
         return cmp(xdate,ydate)
+
+#
+# 辅助函数
+
+def get_worktimes(workshift="8:30-17:30",noonrest="12:30-13:30",continueday_overtime="",leave=[]):
+    """获取该员工应该遵守的工作时间表
+    
+    Args:
+        @workshift: 字符串，员工作息，格式"8:30-17:30"或者Flexible
+        @noonrest:字符串，中午休息，格式"12:30-13:30"
+        @continueday_overtime:字符串，上一个连续工作日的加班时间，格式："1:20"
+        @leave:字符串列表，当天的请假时间段，格式：["8:30-10:30","14:00-15:00"]
+        
+    Return:
+        @worktimes:字符串列表，该员工应该遵守的工作时间表，格式：["8:30-12:20","13:30-17:30"]
+    """
+    worktimes = []
+    worktimes = filter_workshift(workshift,worktimes)
+    worktimes = filter_noonrest(noonrest, worktimes)
+    worktimes = filter_continueday_overtime(continueday_overtime, worktimes)
+    worktimes = filter_leave(leave, worktimes)
+    return worktimes
+
+def filter_workshift(workshift,worktimes):
+    """
+    根据员工的workshift信息，处理worktimes
+    
+    @workshift:字符串，员工作息，格式："8:30-17:30"
+    @worktimes:字符串列表，该员工应该遵守的工作时间表，格式：["8:30-12:20","13:30-17:30"]
+    """
+    mt = re.match(r"(.*)-(.*)",workshift)
+    if mt:
+        worktimes.append(workshift)
+    else:                            # 解析不了都当成 Flexible
+        pass                
+    return worktimes
+
+def filter_noonrest(noonrest,worktimes):
+    """
+    从worktimes中过滤掉中午休息时间，然后返回worktimes
+    
+    @noonrest:字符串，中午休息时间段，格式："12:30-13:30"
+    @worktimes:字符串列表，该员工应该遵守的工作时间表，格式：["8:30-12:20","13:30-17:30"]
+    """
+    tmp_worktimes = []
+    for span in worktimes:
+        tmp_worktimes.extend(subtract(span, noonrest))
+    worktimes = tmp_worktimes
+    return worktimes
+
+def filter_continueday_overtime(continueday_overtime,worktimes):
+    """
+    @continueday_overtime:字符串，前一个连续工作日的加班时间，格式："1:30",
+                           为""空是，表示没加班
+    """
+    overtime = Time.strptime(continueday_overtime)
+    tmp_worktimes = []
+    if overtime == Time(0):                # 没加班,就不需要过滤时间段了
+        tmp_worktimes = worktimes
+    elif Time(0)< overtime <Time(2):
+        for span in worktimes:
+            tmp_worktimes.extend(subtract(span, "6:00-10:00"))      # 把6:00-10：00的时间段去掉，就相当于让员工从10点开始上班了
+    else:
+        for span in worktimes:
+            tmp_worktimes.extend(subtract(span,"6:00-13:00"))       # 暂时预估，下午上班时间不会早于13：00
+    worktimes = tmp_worktimes
+    return worktimes
+
+def filter_leave(leave,worktimes):
+    """
+    从worktimes中过滤掉员工请假的时间，然后返回worktimes
+    
+    @leave:字符串列表，当天的请假时间段，格式：["8:30-10:30","14:00-15:00"]
+    """
+    tmp_worktimes = worktimes
+    for lev in leave:
+        tmp_worktimes = []
+        for span in worktimes:
+            tmp_worktimes.extend(subtract(span, lev))
+        worktimes = tmp_worktimes
+    worktimes = tmp_worktimes
+    return worktimes
+
+def subtract(src,target):
+    """时间段src减去target时间段
+    
+    Args:
+        @src:字符串，源时间段，格式："8:30-12:30"
+        @target:字符串，目标段，格式："10:30-12:30"
+    Return:
+        @timespan:字符串列表，src与target相减后的时间段，例如：["8:30-10:29",]
+    """
+    src_start =Time.strptime(src.split("-")[0])
+    src_end = Time.strptime(src.split("-")[1])
+    target_start = Time.strptime(target.split("-")[0])
+    target_end = Time.strptime(target.split("-")[1])
+    span=[]
+    if src_start < target_start:
+        if src_end < target_start:
+            span.append((src_start,src_end))
+        elif target_start <= src_end < target_end:
+            span.append((src_start,target_start-Time(0,1)))     # 将请假的开始点从工作段去掉
+        elif target_end == src_end:
+            span.append((src_start,target_start-Time(0,1)))
+        elif target_end < src_end:
+            span.append((src_start,target_start-Time(0,1)))
+            span.append((target_end+Time(0,1),src_end))
+    elif target_start <= src_start<= target_end:
+        if src_end <= target_end:     # 时间段被减完了，pass就代表就让span列表为空
+            pass
+        elif target_end < src_end:
+            span.append((target_end+Time(0,1),src_end))
+    elif target_end < src_start:
+        span.append((src_start,src_end))
+    
+    # -----------剔除那些 5分钟内的问题时间段，因为不太可能有5分钟的工作时间段，而且还能使临界点的处理更安全
+    #            如果临界点处理好了，可以考虑去掉该段代码
+    timespan=[]
+    for start,end in span:
+        if end - start >= Time(0,5):
+            timespan.append("-".join([str(start),str(end)]))
+            
+    timespan=["-".join([str(start),str(end)]) for start,end in span]
+    return timespan
+            
+
+# 开始处理考勤表
+#
+
+def get_late_time(worktimes,workstart):
+    """worktimes = ["8:30-12:30","13:30-15:30"]这种形式
+    """
+    late = ''
+    if worktimes == []:
+        late = ''
+    else:
+        sud_start = Time.strptime(worktimes[0].split("-")[0])
+        workstart_time =Time.strptime(workstart)
+        late = str(workstart_time - sud_start)
+    return late
+
+def get_late_team(late):
+    """
+    @late:字符串，迟到时间，格式："1:20"
+    """
+    late_team = ''
+    late_time = Time.strptime(late)
+    if Time(0) <= late_time <= Time(0,15) :
+        late_team = ''
+    else:
+        late_team = str(late-Time(0,15))
+    return late_team
+
+def get_late_person(late):
+    """
+    @late:字符串，迟到时间，格式："1:20"
+    """    
+    late_person = ''
+    late_time = Time.strptime(late)
+    if Time(0) <= late_time <= Time(0,15):
+        late_person = ''
+    elif Time(0,15) < late_time <=Time(1):
+        late_person = str(late_time - Time(0,15))
+    elif Time(1)< late_time <= Time(2):
+        late_person = str( (late_time-Time(0,15))*2 )
+    else:
+        late_person = str( (late_time-Time(0,15))*3 )
+    return late_person
+
+def get_sub_sequence(late):
+    """
+    @late:字符串，迟到时间，格式："1:20"
+    """    
+    late_level = ''
+    late_time = Time.strptime(late)
+    if late_time == Time(0):
+        late_level = ''
+    elif Time(0) < late_time <= Time(0,15):
+        late_level = 'late1'
+    elif Time(0,15) < late_time <=Time(1):
+        late_level = 'late2'
+    elif Time(1)< late_time <= Time(2):
+        late_level = 'late3'
+    else:
+        late_level = 'late4'
+    return late_level   
+
+def get_overtime(worktimes,workstart,workleave):
+    """
+    @worktimes:字符串列表，该员工应该遵守的工作时间表，格式:["8:30-12:30","13:30-17:30"]
+    @workstart:字符串,该员工有效的第一次打卡时间，格式:"8:26"
+    @workleave:字符串,该员工有效的最后一次打卡时间，格式:"18:20"
+    """
+    overtime = ''
+    workstart_time = Time.strptime(workstart)
+    workleave_time = Time.strptime(workleave)
+    if worktimes != []:
+        overtime = str( workleave_time - Time(20) )         # 工作日加班
+    else:
+        overtime = str(workleave_time - workstart_time)       # 非工作日加班
+    return overtime
+
+def get_early_leave(worktimes,workleave):
+    """
+    @worktimes:字符串列表，该员工应该遵守的工作时间表，格式:["8:30-12:30","13:30-17:30"]
+    @workleave:字符串,该员工有效的最后一次打卡时间，格式:"18:20"
+    """    
+    early_leave = ''
+    workleave_time = Time.strptime(workleave)
+    if worktimes==[]:
+        early_leave = ''
+    else:
+        sud_leave = Time.strptime(worktimes[-1].split("-")[-1])
+        early_leave= str(workleave_time-sud_leave)
+    return early_leave
 
 
 class AttendRecord(object):
@@ -303,23 +518,36 @@ class AttendRecord(object):
         else:
             return False
         
-    
-if __name__ =='__main__':
-    def func(attend_number,date_):
-        if date_ == date(2015,10,8):
-            return str(Time(0,5))
-        return ""
 
-    obj =AttendRecord(attend_number="1001", workstart="9:30", workleave="17:50", record_date="2015/10/9", workshift="8:30-17:30",day_type="workday",overtime_from_date=func)
-    print( obj.get_early_leave() )
-    print(obj.get_over_time())
-    print(obj.get_workspan())
-    print(obj.get_late_person())
-    print(obj.get_sub_sequence())
+def test_subtract():
+    print(subtract("8:30-12:30","10:30-12:30"))    # 后端临界
+    print(subtract("8:30-12:30","8:30-10:30"))     # 前段临界
+    print(subtract("8:30-12:30","8:30-12:30"))     # 前后临界
+    print(subtract("8:30-12:30","9:00-11:00"))     # 中间段
     
-    #kaolist1= [['1001',"name1","dp1","2015/9/10","8:30","17:50"],
-               #['1001',"name1","dp1","2015/9/9","9:20","17:40"],
-               #["1000","name2","dp1","2015/9/20","9:30","17:50"]]
-    #print(kaolist1)
-    #kaolist1.sort(cmp=kaolist_cmp)
-    #print(kaolist1)
+    # 下面是不太可能出现的情况，
+    print(subtract("8:30-12:30","13:30-17:30"))    # 不相交
+    print(subtract("13:30-17:30", "8:30-12:30"))
+    
+    print(subtract("8:30-12:30","9:30-13:30")) 
+    print(subtract("13:31-17:30","16:00-17:30"))
+
+def test_fiter_noonrest():
+    print(filter_noonrest("12:30-13:30", ["8:30-17:30"]))
+
+def test_filter_leave():
+    print(filter_leave(["9:00-11:00"], ["8:30-12:30","13:30-17:30"]))
+    print(filter_leave(["9:00-16:00"],["8:30-12:30","13:30-17:30"]))
+def test_filter_overtime():
+    print(filter_continueday_overtime("2:30", ["8:30-12:30","13:30-17:30"]))
+def test_get_worktimes():
+    print(get_worktimes())
+    print(get_worktimes(continueday_overtime="2:30"))
+    print(get_worktimes(leave=["9:00-11:00","16:00-17:30"]))
+    print(get_worktimes(leave=["13:30-17:30"],continueday_overtime="2:30"))
+if __name__ =='__main__':
+    # test_subtract()
+    # test_fiter_noonrest()
+    # test_filter_leave()
+    # test_filter_overtime()
+    test_get_worktimes()
