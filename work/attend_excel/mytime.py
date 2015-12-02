@@ -79,5 +79,8 @@ class Time(object):
     
     def __repr__(self):
         return "<myTime(%s,%s)>"%(self.hour,self.minute)
+    
+    def __int__(self):
+        return self.hour*60+self.minute
 
 
