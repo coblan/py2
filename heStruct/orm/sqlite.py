@@ -32,10 +32,10 @@ class Sqlite(object):
         querystr+=")"
         return querystr
     @staticmethod
-    def update(table,dc,id):
+    def update(table,dc,autoId):
         querystr="UPDATE "+table.__name__+" SET "
         for k,v in dc.items():
             querystr+= k+"=%s"%table.getField(k).todb(v) +','
         querystr=querystr.rstrip(",")
-        querystr+=" WHERE id=%s"%id
+        querystr+=" WHERE autoId=%s"%autoId
         return querystr

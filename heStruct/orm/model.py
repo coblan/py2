@@ -24,7 +24,7 @@ class Model(object):
     __metaclass__=Meta
     db=Sqlite
     # 添加一个自增
-    id = AutoIncrement()
+    autoId = AutoIncrement()
     currentid=None
     def __init__(self,**kw):
         for k ,v in kw.items():
@@ -59,7 +59,7 @@ class Model(object):
     def save(self):
         dc = self.get_fields()
         try:
-            updatestr=self.db.update(self.__class__,dc,self.id)
+            updatestr=self.db.update(self.__class__,dc,self.autoId)
             self.cursor.execute(updatestr)            
             
         except AttributeError:
@@ -69,13 +69,13 @@ class Model(object):
             self.commit()
             # 如果没有id，把最新的一个id赋予self
             if Model.currentid is None:
-                for i in self.select("ORDER BY id"):
-                    self.getField('id').setvalue(self,i.autoId)
+                for i in self.select("ORDER BY autoId"):
+                    self.getField('autoId').setvalue(self,i.autoId)
                     Model.currentid =i.autoId
                     break
             else:
                 Model.currentid +=1
-                self.getField('id').setvalue(self,Model.currentid)
+                self.getField('autoId').setvalue(self,Model.currentid)
                 #self.id = Model.currentid            
             
         
@@ -97,7 +97,7 @@ class Model(object):
             cnt = 0
             for k,v in cls.fields:
                 if cnt==0:
-                    cls.getField('id').setvalue(item,row[0])
+                    cls.getField('autoId').setvalue(item,row[0])
                 else:
                     setattr(item,k,row[cnt])
                 cnt+=1
@@ -133,13 +133,13 @@ if __name__ == '__main__':
     t2.save()
     
     print(t2.name)
-    print(t2.id)
+    print(t2.autoId)
     
     #test.clear()
     tt = test()
     tt.name='heyulin'  
     tt.age =1100
     tt.save()
-    print(tt.id)
+    print(tt.autoId)
     test.commit()
     
