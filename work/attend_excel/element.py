@@ -13,7 +13,11 @@ class Time(object):
     ========================
     实现了 + ,- ,* ,排序比较 ，str()
     
-    存放数据库时使用字符串保存,如str(timeobj)
+    注意
+    =======================
+    1.当Time相减时，如果为负数，则自动清空为Time(0)
+    2.str(Time(0))返回的是空字符串，而不是"0:00"
+    
     """
     def __init__(self,hour,minute=0):
         self.hour=hour
@@ -65,7 +69,7 @@ class Time(object):
         if self.hour==0 and self.minute == 0:
             return ""
         else:
-            return '%s:%02d:00'%(self.hour,self.minute)
+            return '%s:%02d'%(self.hour,self.minute)
     
     def __add__(self,other):
         hour = self.hour+other.hour
@@ -82,3 +86,6 @@ class Time(object):
         return "<myTime(%s,%s)>"%(self.hour,self.minute)
 
 
+
+    
+    

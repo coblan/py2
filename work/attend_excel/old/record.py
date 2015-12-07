@@ -1,7 +1,4 @@
 # -*- encoding:utf8 -*-
-"""
-尽管提交悲剧，但是使我感受到了ORM的强大之处
-"""
 import xlrd,sqlite3,re
 from openpyxl import Workbook
 from mytime import Time,MyTimeField

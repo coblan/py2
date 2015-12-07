@@ -1,6 +1,5 @@
 # -*- encoding:utf8 -*-
 
-from orm.fields import CharField
 class Time(object):
     """
     由于python标准库的datetime.time运算不方面，所以这里简单的实现了time的计算功能。
@@ -14,7 +13,6 @@ class Time(object):
     ========================
     实现了 + ,- ,* ,排序比较 ，str()
     
-    存放数据库时使用字符串保存,如str(timeobj)
     """
     def __init__(self,hour,minute=0):
         self.hour=hour
@@ -66,7 +64,7 @@ class Time(object):
         if self.hour==0 and self.minute == 0:
             return ""
         else:
-            return '%s:%02d:00'%(self.hour,self.minute)
+            return '%s:%02d'%(self.hour,self.minute)
     
     def __add__(self,other):
         hour = self.hour+other.hour
@@ -81,18 +79,8 @@ class Time(object):
     
     def __repr__(self):
         return "<myTime(%s,%s)>"%(self.hour,self.minute)
+    
+    def __int__(self):
+        return self.hour*60+self.minute
 
 
-class MyTimeField(CharField):
-    def todb(self, obj):
-        if obj is None:
-            return "NULL"
-        assert isinstance(obj,Time)
-        return "'%s'"%str(obj)
-    def __set__(self, obj, val):
-        if val is None or isinstance(val,Time):
-            setattr(obj,"_field%s"%self.cnt,val)
-        elif isinstance(val,(str,unicode)):
-            setattr(obj,"_field%s"%self.cnt,Time.strptime(val))
-        else:
-            raise ValueError("MYTimeField set erro")
