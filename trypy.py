@@ -33,26 +33,28 @@
     #age = 100
 
 #print( me().__dict__)
+# ------------------------描述器
+#class Name(object):
+    #def __set__(self,obj,val):
+        #self.val = val
+        #print(self,obj,val)
+    #def __get__(self,obj,tp =None):
+        #print(self,obj,tp)
+        #return self.val
+    #def tostr(self,obj):
+        #return obj
 
-class Name(object):
-    def __set__(self,obj,val):
-        self.val = val
-        print(self,obj,val)
-    def __get__(self,obj,tp =None):
-        print(self,obj,tp)
-        return self.val
-    def tostr(self,obj):
-        return obj
+#class person(object):
+    #name = Name()
 
-class person(object):
-    name = Name()
+#print(person.name)
+#p = person()
+#p.name='haha'
 
-print(person.name)
-p = person()
-p.name='haha'
+#p2=person()
+#p2.name = "dog"
+#print( p.name )
+#print(p2.name)
 
-p2=person()
-p2.name = "dog"
-print( p.name )
-print(p2.name)
+print('\u00e5\u00ae\u00b9')
 
