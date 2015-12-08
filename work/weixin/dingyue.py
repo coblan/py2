@@ -51,8 +51,8 @@ def add_menu():
            "sub_button":[
            {	
                "type":"view",
-               "name":"年会节目主界面21",
-               "url":"https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx7080c32bd10defb0&redirect_uri=http%3a%2f%2fcoblan.sinaapp.com%2fnianhui%2f&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect"
+               "name":"年会节目主界面测试1",
+               "url":"https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx7080c32bd10defb0&redirect_uri=http%3a%2f%2fcoblan.sinaapp.com%2fnianhui%2fjiemu%2f&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect"
             },
             ]
        }]
@@ -83,7 +83,7 @@ def get_user_with_openids(openids):
 
 if __name__=='__main__':
     #print(AccessToken().get())
-    #add_menu()
-    openids=['o6hHBv6HoSpoA8RphJ1sP7zgOlIk','o6hHBv1AfKq8rH5LAY6AY_gHbQrc','sdfsgweggsd']
-    print( get_user_with_openids(openids) )
+    add_menu()
+    # openids=['o6hHBv6HoSpoA8RphJ1sP7zgOlIk','o6hHBv1AfKq8rH5LAY6AY_gHbQrc','sdfsgweggsd']
+    # print( get_user_with_openids(openids) )
     
