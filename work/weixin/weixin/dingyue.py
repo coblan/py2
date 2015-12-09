@@ -13,8 +13,8 @@ def main():
     
     # add_menu(crt_token)
     
-    # for i in range(100):
-        # test_local()
+    #for i in range(100):
+        #test_local()
     #抢答
     test_local()
     
