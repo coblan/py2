@@ -56,5 +56,39 @@
 #print( p.name )
 #print(p2.name)
 
-print('\u00e5\u00ae\u00b9')
+#print('\u00e5\u00ae\u00b9')
 
+import memcache
+    
+_mc = memcache.Client(['127.0.0.1:11211'],debug=0)  
+class __MC(object):
+    def __setattr__(self,name,value):
+        _mc.set(name,value)
+    def __getattr__(self,name):
+        obj = _mc.get(name)
+        if isinstance(obj,list):
+            return _proxy(obj)
+        else:
+            return _mc.get(name)
+        
+class _proxy(object):
+    def __init__(self,ls):
+        self.ls=ls
+    def __getattr__(self,name):
+        def func(*args,**kw):
+            ls =self.ls
+            getattr(ls,name)(*args,**kw)
+            self.ls=ls
+        return func
+        
+gd=__MC()    
+
+gd.mm='ri'
+print(gd.mm)
+gd.ls=[]
+#ls=gd.ls
+#ls.append('haha')
+#gd.ls=ls
+gd.ls.append('haha')
+
+print(gd.ls)
