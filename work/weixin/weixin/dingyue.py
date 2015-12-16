@@ -13,7 +13,7 @@ def main():
     
     # add_menu(crt_token)
     
-    # for i in range(100):
+    # for i in range(50):
         # test_local()
     #抢答
     test_local()
@@ -172,7 +172,9 @@ def test_local():
 </xml>
     """    
     headers = {'content-type': 'text/xml'}
-    rq= requests.post("http://127.0.0.1:8000/nianhui/weixin/", data=data, headers=headers)
+    local="http://127.0.0.1:8000/nianhui/weixin/"
+    web = "http://coblan.sinaapp.com/nianhui/weixin/"
+    rq= requests.post(local, data=data, headers=headers)
     print(rq.text)
 
 

@@ -8,7 +8,7 @@
 流程
 =============================
 main()是主函数，从main开始执行。
-1. 调用get_attend_list()生成器，遍历该生成器的结果，每次一个员工的当月考勤记录。
+1. 调用get_attend_list()生成器，遍历该生成器的结果，每次一个员工的当月所有考勤记录。
 2. 生成一些员工的基本信息
 3. 调用record_employee()函数，计算【月考勤记录】表数据。
          算法来自于:attend.py
@@ -72,7 +72,7 @@ def main(read_path,write_path='',get_worktype=lambda x:'FTE', get_month_end_over
         
         # 生成【月考勤统计】表中，该员工的统计数据
         # report = dict(....)
-        report = report_empoyee(records,worktype,workshift)
+        report = report_empoyee(empid,records,worktype,workshift)
         
         # 保存到TMS中，现在是预留着，以后实现。Todo
         save_attend(records,report)        
@@ -212,7 +212,7 @@ def report_empoyee(empid,records,worktype,workshift,get_leave=lambda x,y:[]):
             late3 +=1
         elif late_level == 'late4':
             late4 +=1
-        late_times += row[8]
+        
         if late_level in ['late2','late3','late4']:
             late_cnt +=1
         absent+= row['absent']
@@ -220,9 +220,12 @@ def report_empoyee(empid,records,worktype,workshift,get_leave=lambda x,y:[]):
         late_team += int(row['late_team'])
         overtime += int(row['overtime'])
         workspan += int(row['workspan'])
+    
+    act_late_times = late_team
     max_workday = attend.report_max_workday(days)
     exp_workday = attend.report_expect_workday(days,empid)
     act_workday = attend.report_act_workday(exp_workday, person_leave, sick_leave)
+    # 补贴扣除天数
     allow_sub_days = attend.report_allow_sub_days(person_leave, sick_leave, annual_leave, 
                                 other_paid_leave, over_late3_days=late3+late4)
     allow_days = attend.report_allow_days(exp_workday, allow_sub_days)
@@ -230,7 +233,8 @@ def report_empoyee(empid,records,worktype,workshift,get_leave=lambda x,y:[]):
                             other_paid_leave, swap_off)
     paid_leave = attend.report_paid_leave(annual_leave, other_paid_leave)
     deduction = attend.report_deduction(absent)
-    process = attend.report_process(late_cnt,late_times)
+    #考勤处理：书面警告，口头警告
+    process = attend.report_process(late_cnt,act_late_times)
     full_attend = attend.report_full_attend(worktype, workshift, exp_workday,  max_workday,  
                             person_leave,  sick_leave,  paid_leave, late_all,  absent, early_leave)
     return {
@@ -268,7 +272,7 @@ def test_main():
     # def get_leave(empid,date_):
         # return []
     
-    main(r"D:\work\attendance\attendance record.xls")
+    main(r"D:\work\attendance\attendance record.xls",r"D:\work\attendance\gen\out_record.xlsx")
 
    
 if __name__ == '__main__':

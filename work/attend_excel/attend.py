@@ -29,6 +29,13 @@ from mytime import Time
 
 # 计算考勤记录
 
+def i2t(second):
+    return "%s:%s"%(second/60,second%60)
+    
+def t2i(tstr):
+    ls = tstr.split(':')
+    return int(ls[0])*60+int(ls[1])
+
 # 辅助函数
 def is_workday(date_):
     """判断是否工作日，
@@ -46,7 +53,7 @@ def is_workday(date_):
     
     """
     date_obj = datetime.strptime(date_, "%Y/%m/%d")
-    if date_obj.weekday() in [0,1,2,3,4]:         #星期一到星期五
+    if date_obj.weekday() in [0,1,2,3,4]:         #星期一到星期五是工作日
         return True,""
     else:
         return False,''
@@ -499,5 +506,9 @@ if __name__ =='__main__':
             self.assertEqual(get_worktimes(continueday_overtime="2:30"),["13:30-17:30"])
             self.assertEqual(get_worktimes(leave=["9:00-11:00","16:00-17:30"]),['8:30-8:59',"11:01-12:30","13:30-15:59"])
             self.assertEqual(get_worktimes(leave=["13:30-17:30"],continueday_overtime="2:30"),[])  
+        
             
-    unittest.main()
+    # unittest.main()
+    print( i2t(100) )
+    print(t2i("8:30"))
+    print(i2t(510))
