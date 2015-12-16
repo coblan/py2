@@ -12,6 +12,7 @@ from orm.fields import CharField
 import sqlite3
 
 
+
 class EmployModel(Model):
     "雇员的信息，当前信息来源于从excel提取出的固定信息"
     empid = CharField(default="")
