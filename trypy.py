@@ -56,5 +56,8 @@
 #print( p.name )
 #print(p2.name)
 
-print('\u00e5\u00ae\u00b9')
+#print('\u00e5\u00ae\u00b9')
 
+ls =('dog','pig')
+ls +=('jj',)
+print(ls)
