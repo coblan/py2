@@ -165,7 +165,7 @@ def test_local():
 # </xml>
     # """
     data ="""<xml><ToUserName><![CDATA[gh_7b76db9b0422]]></ToUserName>
-<FromUserName><![CDATA[o6hHBv1AfKq8rH5LAY6AY_gHbQrc]]></FromUserName>
+<FromUserName><![CDATA[o6hHBv2u5zy_m7ytZP374Nn9Li_o]]></FromUserName>
 <CreateTime>1446453151</CreateTime>
 <MsgType><![CDATA[text]]></MsgType>
 <Content><![CDATA[这里是内容]]></Content>

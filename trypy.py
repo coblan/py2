@@ -56,5 +56,13 @@
 #print( p.name )
 #print(p2.name)
 
-print('\u00e5\u00ae\u00b9')
+# print('\u00e5\u00ae\u00b9')
+
+from string import Template
+class MyTemp(Template):
+    delimiter ='$$'
+
+s = 'hello $${name} mornint'
+j=MyTemp(s).safe_substitute({'name':'dog'})
+print(j)
 
