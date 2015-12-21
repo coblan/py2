@@ -1,10 +1,7 @@
 import sys
-
-sys.dog =True
-print(id(sys.dog))
-print(sys.dog==True)
-print(id(True))
-
-sys.dog=False
-print(id(sys.dog))
-print(sys.dog==True)
+from PyQt4.QtGui import *
+if __name__ =='__main__':
+    app = QApplication(sys.argv)
+    win = QWidget()
+    win.show()
+    sys.exit(app.exec_())
