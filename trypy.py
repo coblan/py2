@@ -1,3 +1,5 @@
+# -*- encoding:utf8 -*-
+
 #class p(object):
     #def __new__(cls,name):
         #print('new')
@@ -73,3 +75,17 @@
 # ls =('dog','pig')
 # ls +=('jj',)
 # print(ls)
+
+# import base64
+# p = base64.b64encode('中国')
+# print(p)
+
+def func(name,**kw):
+    print(name)
+    
+dc ={'name':'dog','age':18}
+
+func(**dc)
+print(dir(func))
+print(func.func_globals)
+help(func)

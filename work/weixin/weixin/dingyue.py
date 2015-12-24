@@ -23,10 +23,17 @@ def main():
 
 def access_token():
     '''获取accses_token,
+    appid=wx7080c32bd10defb0&secret=d4624c36b6795d1d99dcf0547af5443d
+    9Qi5G3iunWcAagJ3jvBWitJb8p6KpzzBRREPVIXng4_ENvtDft-PtWMJxbhxDQMNBFuKQDkPhakJi-R2dyBLOaBhuR6EhrMIC5MKpbifOHwFOEjAGABKA
     曾经获得的一个：
     "type":"image","media_id":"ZWx3LgGb3jRu79rGlnVKW9SDE-hRjCrBh5IJ91nCiX9VcYA4N-8FYfq24opF6A05"
     '''
-    rq = requests.get('https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=wx7080c32bd10defb0&secret=d4624c36b6795d1d99dcf0547af5443d')
+    appid = 'wx7080c32bd10defb'
+    secret='d4624c36b6795d1d99dcf0547af5443d'
+    #moki
+    # appid = 'wx4caa217911a92dbd'
+    # secret = '257666d2ee35c47df38f4f6dd759813e'
+    rq = requests.get('https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid='+appid+'&secret='+secret)
     print(rq.text) 
     
 def send_media(token,type_,file_):
@@ -164,8 +171,9 @@ def test_local():
 # <EventKey><![CDATA[V1001_GOOD]]></EventKey>
 # </xml>
     # """
+    # moki某人:olEWajiSzMCHUkqNue5zMg43gvKM
     data ="""<xml><ToUserName><![CDATA[gh_7b76db9b0422]]></ToUserName>
-<FromUserName><![CDATA[o6hHBv2u5zy_m7ytZP374Nn9Li_o]]></FromUserName>
+<FromUserName><![CDATA[olEWajiSzMCHUkqNue5zMg43gvKM]]></FromUserName>
 <CreateTime>1446453151</CreateTime>
 <MsgType><![CDATA[text]]></MsgType>
 <Content><![CDATA[这里是内容]]></Content>
@@ -182,7 +190,14 @@ def test_get_user():
     from wxcom import get_openid
     print(get_openid('031de0724b2d7b880277cfc494cd2dec'))
 
+def test_mokiUrl():
+    url = 'http://216.12.198.102:8181/nianhui/weixin/'
+    dc = {'echostr':'i m echostr'}
+    rq = requests.get(url,params=dc)
+    print(rq.text)
+
 if __name__ =='__main__':
     main()
+    # test_mokiUrl()
     # test_get_user()
 
