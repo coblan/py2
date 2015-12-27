@@ -1,3 +1,5 @@
+# -*- encoding:utf8 -*-
+
 #class p(object):
     #def __new__(cls,name):
         #print('new')
@@ -56,6 +58,7 @@
 #print( p.name )
 #print(p2.name)
 
+<<<<<<< HEAD
 #print('\u00e5\u00ae\u00b9')
 
 #import memcache
@@ -94,3 +97,36 @@
 #print(gd.ls)
 ls = []
 print(ls.append('kk'))
+=======
+# <<<<<<< HEAD
+# # print('\u00e5\u00ae\u00b9')
+
+# from string import Template
+# class MyTemp(Template):
+    # delimiter ='$$'
+
+# s = 'hello $${name} mornint'
+# j=MyTemp(s).safe_substitute({'name':'dog'})
+# print(j)
+# =======
+# #print('\u00e5\u00ae\u00b9')
+# >>>>>>> 849aab8be0d096ec7df42667da9a697e06e54590
+
+# ls =('dog','pig')
+# ls +=('jj',)
+# print(ls)
+
+# import base64
+# p = base64.b64encode('中国')
+# print(p)
+
+def func(name,**kw):
+    print(name)
+    
+dc ={'name':'dog','age':18}
+
+func(**dc)
+print(dir(func))
+print(func.func_globals)
+help(func)
+>>>>>>> t2int
