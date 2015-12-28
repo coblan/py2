@@ -1,62 +1,77 @@
 # -*- encoding:utf8 -*-
 """
 用途
-=============================
+===============================================
 计算【月考勤记录】，【月考勤统计】
 调用的算法来自于attend.py
 
-流程
-=============================
+处理流程
+===============================================
 main()是主函数，从main开始执行。
-1. 调用get_attend_list()生成器，遍历该生成器的结果，每次一个员工的当月所有考勤记录。
-2. 生成一些员工的基本信息
+1. 调用excel.get_attend_list(path)生成器
+   该生成器，从path指定的原始考勤记录excel03文件读取数据，每次返回一个员工的当月所有考勤记录。
+   返回的数据结构,见函数文档
+   
+2. 生成一些员工的基本信息，
+    如：考勤号转换为员工号
+        获取上个月最后一天的加班情况
+        获取员工的规定作息时间(workshift)
+        获取员工的工作类型
+        
 3. 调用record_employee()函数，计算【月考勤记录】表数据。
-         算法来自于:attend.py
-4. 利用3计算出的【月考勤记录】数据，调用report_empoyee()，生成【月考勤统计】
-         算法来自于:attend.py
+    record_employee(attends,...)中的参数attends,就是第[1]部中的函数get_attend_list()，每次返回的一个列表对象。
+    record_employee()的算法来自于:attend.py
+    
+4. 利用[3]计算出的【月考勤记录】数据，调用report_empoyee()，生成【月考勤统计】
+    record_employee()的算法来自于:attend.py以report_开头的函数
+    
 6. 将3，4步结果数据保存到TMS系统
-7. 生成excel07文件，并保存.
 
-ToDo
-============================
-到目前为止，还需要提供的函数,当前这些函数只是简单的模拟:
-attend_num_to_empid(attend_number):根据考勤号，返回员工号
+7. 生成excel07文件，并保存.
+    wb,record_sheet,report_sheet =excel.gen_attend_excel()
+    分别是“工作簿”，“月考勤记录”，“月考勤统计”
+
+外部接口
+(现在暂时调用record_interface.py中的临时函数)
+===============================================
+需要外部提供的函数,
+attend_num_to_empid(attend_number):根据考勤号，返回员工号.TMS提供。之所以使用该函数，是考虑到员工号比考勤号通用，在tms中查询数据时，利用员工号进行查询。
 get_workshift(empid):根据empid员工号，返回员工的规定作息
 get_worktype(empid):根据empid，返回员工的工作类型，如'FTE'
 get_leave(empid,date_) ,获取员工请假情况,返回【假期对象】列表，
                       每个【假期对象】必须有timespan()方法，用于返回假期的时间段，例如:"8:30-12:30"
                       必须有type()方法，返回假期类型，如：'person leave','sick leave','annual leave','other paid leave','swap off'
+                      
 
+save_attend(),预留，将数据保存到TMS中
 get_month_end_overtime(empid,date)  获取date所在月末，该员工的加班情况
 """
 import re
 from datetime import datetime,date,timedelta
-from mytime import Time
 from excel import get_attend_list,gen_attend_excel
 import attend
 from attend import i2t,t2i,i2day
-                
-def main(read_path,write_path='',get_worktype=lambda x:'FTE', get_month_end_overtime=lambda e,m:'',
-         attend_num_to_empid=lambda x:"AE1001",save_attend=lambda x,y:'',get_workshift=lambda x:"8:30-17:30"):
+
+# ----------------临时的外部接口函数-------TMS中替换掉这些引入-------------------
+from record_interface import get_worktype,get_month_end_overtime,attend_num_to_empid,save_attend,get_workshift,is_workday,get_leave
+
+def main(read_path,write_path=''):
     """主函数，处理考勤原始记录
     
     Args:
     @read_path: 读取地址
     @write_path:写地址
-    @get_worktype(empid),获取员工的工作类型，预留，TMS提供
-    @attend_num_to_empid(attend_number),将考勤号转换为员工号，TMS提供。之所以使用该函数，是考虑到员工号比考勤号通用，在tms中查询数据时，利用员工号进行查询。
-    @save_attend(),预留，将数据保存到TMS中
-    @get_workshift(empid),从员工号获取员工作息，有TMS提供
+
     
     """
     # 生成Excel07文件wb,两个工作表record,report。
-    
+    # 如果不再生成excel，可以将这两个列表去掉
     records =[]
     reports =[]
+    
     # 以考勤号分组，遍历整个考勤记录
     for attends in get_attend_list(read_path):
-        # attends=[ row_dict,] ，是某员工的考勤记录列表，每一项都是一个字典。
-        # row_dict的键有:[attend_number,name,department,record_date,timestr,workstart,workleave]
+        # attends=[dict(attend_number,name,department,record_date,timestr,workstart,workleave)]
         attend_number = attends[0]['attend_number']
         # 在TMS中员工号比考勤号通用，所以将考勤号换算成员工号，方便后面查询信息
         empid = attend_num_to_empid(attend_number)
@@ -68,8 +83,9 @@ def main(read_path,write_path='',get_worktype=lambda x:'FTE', get_month_end_over
         worktype = get_worktype(empid)
         last_day = datetime.strptime(attends[0]['date'],'%Y/%m/%d').date()-timedelta(days=1)
         last_overtime=get_month_end_overtime(empid,last_day)
+        
         # 生成【月考勤记录】表中，该员工的当月数据
-        # records= [dict(attend_number,name,date,workstart,workleave,workspan,late_level,late_person,late_team,overtime,absent,timestr),] 
+        # record= [dict(attend_number,name,date,workstart,workleave,workspan,late_level,late_person,late_team,overtime,absent,timestr),] 
         record = record_employee(attends,workshift,empid,last_overtime)
        
         # 生成【月考勤统计】表中，该员工的统计数据
@@ -80,7 +96,7 @@ def main(read_path,write_path='',get_worktype=lambda x:'FTE', get_month_end_over
         records.extend(record)
         reports.append(report)
         
-    # 生成Excel
+    # ---------------------生成Excel--------可能是以后不再生成excel-----------------------------------
     wb,record_sheet,report_sheet =gen_attend_excel()
     record_sheet.append([u'考勤号',u'名字',u'日期',u'上班时间',u'下班时间',
                          u'工作时长',u'迟到等级',u'个人迟到时间',u'团队迟到时间',u'加班',
@@ -101,13 +117,11 @@ def main(read_path,write_path='',get_worktype=lambda x:'FTE', get_month_end_over
                              row['late4'],i2t(row['late_person']),i2t(row['late_team']),i2t(row['overtime']),i2day(row['exp_workhours']),
                              i2day(row['act_workhours']),i2day(row['allow_hours']),i2day(row['leave_hours']),i2day(row['deduction']),row['process'],
                              i2day(row['absent']),i2t(row['early_leave']),row['full_attend']])
-    # report_sheet.append(reports)
-    # 保存Excel
+    # -------------------保存Excel
     wb.save(write_path)
         
         
-def record_employee(attends,workshift,empid,last_ctnday_overtime_lastmonth='',get_leave=lambda x,y:[],
-                     noonrest="12:30-13:30"):
+def record_employee(attends,workshift,empid,last_ctnday_overtime_lastmonth=0,noonrest="12:30-13:30"):
     """
     Args:
     @attends=[ dict(attend_number,name,department,record_date,timestr,workstart,workleave),]
@@ -129,26 +143,42 @@ def record_employee(attends,workshift,empid,last_ctnday_overtime_lastmonth='',ge
         timestr = row['timestr']
         workstart = row['workstart']
         workleave = row['workleave']           
-        workday,specialshift = attend.is_workday(date_)
+        workday,specialshift = is_workday(date_)
         if workday:
-            leave_timespan = [x.timespan() for x in get_leave(empid,date_)]
-            if specialshift == '':   #表示正常工作日
-                worktimes = attend.get_worktimes(workshift,continueday_overtime=last_ctnday_overtime,leave=leave_timespan,noonrest=noonrest)
-            else:
-                worktimes = attend.get_worktimes(specialshift,continueday_overtime=last_ctnday_overtime,leave=leave_timespan,noonrest=noonrest)
-            sud_start,sud_leave = attend.time_range(worktimes)
-            late = attend.get_late_time(sud_start,workstart)
-            late_person = attend.get_late_person(late)
-            late_team = attend.get_late_team(late)
-            late_level = attend.get_sub_sequence(late)
-            early_leave = attend.get_early_leave(sud_leave,workleave) 
-            workspan = attend.get_workspan(workstart,workleave)
-            overtime = attend.get_overtime(workshift,workstart,workleave)
-            absent = attend.get_absent(workstart,workleave)
-            
-            # 记录下工作日加班，下个循环时，用于计算迟到
-            last_ctnday_overtime = overtime
-            
+                mt = re.match(r"(.*)-(.*)",workshift)
+                if mt:
+                    leave_timespan = [x.timespan() for x in get_leave(empid,date_)]
+                    if specialshift == '':   #表示正常工作日
+                        worktimes = attend.get_worktimes(workshift,continueday_overtime=last_ctnday_overtime,leave=leave_timespan,noonrest=noonrest)
+                    else:
+                        worktimes = attend.get_worktimes(specialshift,continueday_overtime=last_ctnday_overtime,leave=leave_timespan,noonrest=noonrest)
+                    sud_start,sud_leave = attend.time_range(worktimes)
+                    absent = attend.get_absent(workstart,workleave)
+                    if absent !=0:      # 只要有旷工，就不去计算他的迟到，早退
+                        late = 0
+                        early_leave=0
+                    else:
+                        late = attend.get_late_time(sud_start,workstart)
+                        early_leave = attend.get_early_leave(sud_leave,workleave)
+                    late_person = attend.get_late_person(late)
+                    late_team = attend.get_late_team(late)
+                    late_level = attend.get_sub_sequence(late)
+                    workspan = attend.get_workspan(workstart,workleave)
+                    overtime = attend.get_overtime(workshift,workstart,workleave)
+                    # absent = attend.get_absent(workstart,workleave)
+                    
+                    # 记录下工作日加班，下个循环时，用于计算迟到
+                    last_ctnday_overtime = overtime
+                    
+                else:   # workshif == flexable的人
+                    late_person = 0
+                    late_team = 0
+                    late_level = ''
+                    early_leave = 0  
+                    workspan = workleave-workstart #str(workleave - workstart)
+                    overtime = 0 
+                    absent = 0
+                    last_ctnday_overtime = 0                    
  
                            
         else:
@@ -156,9 +186,8 @@ def record_employee(attends,workshift,empid,last_ctnday_overtime_lastmonth='',ge
             late_team = 0
             late_level = ''
             early_leave = 0  
-            # workstart,workleave = 0,0 # Time.strptime(workstart), Time.strptime(workleave)  
-            workspan = workleave-workstart #str(workleave - workstart)
-            overtime = workleave-workstart #str(workleave - workstart)
+            workspan = workleave-workstart 
+            overtime = workleave-workstart 
             absent = 0
             # 把工作日加班清空
             last_ctnday_overtime = 0
@@ -167,8 +196,8 @@ def record_employee(attends,workshift,empid,last_ctnday_overtime_lastmonth='',ge
             "attend_number":attend_number,
             "name":name,
             "date":date_,
-            "workstart":workstart, #str(workstart),
-            "workleave":workleave, #str(workleave),
+            "workstart":workstart, 
+            "workleave":workleave,
             "workspan":workspan,
             "late_level":late_level,
             "late_person":late_person,
@@ -181,7 +210,7 @@ def record_employee(attends,workshift,empid,last_ctnday_overtime_lastmonth='',ge
         records.append(day_attend)
     return records
 
-def report_empoyee(empid,record,worktype,workshift,get_leave=lambda x,y:[]):
+def report_empoyee(empid,record,worktype,workshift):
     """考勤统计，
     Args:
     @Records: [record_dict,]，某个员工当月的【考勤记录】列表。record_dict是字典，它的键有:(attend_number,name,date_,workstart,workleave,
@@ -249,20 +278,20 @@ def report_empoyee(empid,record,worktype,workshift,get_leave=lambda x,y:[]):
     
     late_all = late1+late2+late3+late4
     late_act_times = late_team
-    max_workhours = attend.report_max_workhours(days)
-    exp_workhours = attend.report_expect_workhours(days,empid)
-    act_workhours = attend.report_act_workhours(exp_workhours, person_leave, sick_leave,absent)
+    max_worktime = attend.report_max_worktime(days)
+    exp_worktime = attend.report_expect_worktime(days,empid)
+    act_worktime = attend.report_act_worktime(exp_worktime, person_leave, sick_leave,absent)
     # 补贴扣除天数
-    allow_sub_hours = attend.report_allow_sub_hours(person_leave, sick_leave, annual_leave, 
+    allow_subtime = attend.report_allow_subtime(person_leave, sick_leave, annual_leave, 
                                 other_paid_leave, over_late3_days=late3+late4)
-    allow_hours = attend.report_allow_hours(exp_workhours, allow_sub_hours)
-    leave_hours = attend.report_leave_hours(person_leave, sick_leave, annual_leave, 
+    allow_time = attend.report_allowtime(exp_worktime, allow_subtime)
+    leave_time = attend.report_leavetime(person_leave, sick_leave, annual_leave, 
                             other_paid_leave, swap_off)
     paid_leave = attend.report_paid_leave(annual_leave, other_paid_leave)
     deduction = attend.report_deduction(absent)
     #考勤处理：书面警告，口头警告
     process = attend.report_process(late_cnt,late_act_times,absent)
-    full_attend = attend.report_full_attend(worktype, workshift, exp_workhours,  max_workhours,  
+    full_attend = attend.report_full_attend(worktype, workshift, exp_worktime,  max_worktime,  
                             person_leave,  sick_leave,  paid_leave, late_all,  absent, early_leave)
     return {
         'empid':empid,
@@ -280,10 +309,10 @@ def report_empoyee(empid,record,worktype,workshift,get_leave=lambda x,y:[]):
         'late_person':late_person,
         'late_team':late_team,
         'overtime':overtime,
-        'exp_workhours':exp_workhours,
-        'act_workhours':act_workhours,
-        'allow_hours':allow_hours,
-        'leave_hours':leave_hours,
+        'exp_workhours':exp_worktime,
+        'act_workhours':act_worktime,
+        'allow_hours':allow_time,
+        'leave_hours':leave_time,
         'deduction':deduction,
         'absent':absent,
         'process':process,

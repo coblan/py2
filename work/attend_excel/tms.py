@@ -10,7 +10,8 @@ import openpyxl,pickle
 from orm.model import Model
 from orm.fields import CharField
 import sqlite3
-
+import os
+BASE_DIR = os.path.dirname(__file__)
 
 
 class EmployModel(Model):
@@ -27,13 +28,14 @@ class EmployModel(Model):
     startmokie = CharField(default='')
     
 #EmployModel.connection(sqlite3.connect("tmpfiles/employee"))
+
 class TmsData(object):
     
     @staticmethod
     def loadFromExcel():
         EmployModel.connection(sqlite3.connect(":memory:"))
         EmployModel.create()
-        wb=openpyxl.load_workbook("employee.xlsx")
+        wb=openpyxl.load_workbook(os.path.join(BASE_DIR,"employee.xlsx"))
         ws= wb.active
         head=True
         for i in ws.rows:
@@ -69,9 +71,17 @@ class TmsData(object):
         else:
             return ''
         
-if __name__ !="__main__":
-    TmsData.loadFromExcel()
+def get_workshift(empid):
+    for i in EmployModel.select("WHERE empid='%s'"%empid):
+        return i.work_shift
 
+def get_worktype(empid):
+    for i in EmployModel.select("WHERE empid='%s'"%empid):
+        return i.work_type
+
+def attend_num_to_empid(kao_num):
+    for i in EmployModel.select("WHERE kao_number='%s'"%kao_num):
+        return i.empid
 
 def geninfo():
     "直接运行该函数，将解析xlsx与xls文件，将生成一个列表，并保存到硬盘，目的是将empID同kao_number对应起来。"
@@ -130,7 +140,13 @@ def geninfo():
         assert isinstance(row,EmployModel)
         ws.append([row.empid,row.kao_number,row.name,row.pname,row.status,row.work_type,row.work_shift,row.startjob,row.startmokie])
     wb2.save("employee.xlsx")
-            
+
+
+if __name__ !="__main__":
+    TmsData.loadFromExcel()
+
 if __name__ =='__main__':
-    from attend_reader import Raw_Record
-    geninfo()
+    # from attend_reader import Raw_Record
+    # geninfo()
+    TmsData.loadFromExcel()
+    print( get_workshift('AE1776'))

@@ -8,7 +8,7 @@ import re
 from datetime import datetime
 import xlrd
 from openpyxl import Workbook
-from mytime import Time
+# from mytime import Time
 from attend import i2t,t2i
 
 def get_attend_list(path):
@@ -20,7 +20,7 @@ def get_attend_list(path):
     Return:
     @outlist=[record,..]，record是一条考勤记录字典。
                           字典中有attend_number,name,department,date,timestr,workstart,workleave
-                                  考勤号，名字，部门，日期，原始打卡字符串,上班打卡时间(int)，下班打卡时间(int)
+                                考勤号，名字，部门，日期，原始打卡字符串,上班打卡时间(int)，下班打卡时间(int)
     
     注意，该函数是【生成器】，每次返回一个员工所有的考勤数据
     """    

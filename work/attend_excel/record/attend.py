@@ -25,37 +25,38 @@
 """
 import re
 from datetime import datetime,date,timedelta
-from mytime import Time
+from record_interface import is_workday
+# from mytime import Time
 
 # 辅助函数
-def is_workday(date_):
-    """判断是否工作日，
+# def is_workday(date_):
+    # """判断是否工作日，
     
-    Args:
-    @date_:字符串，当天的日期，例如："2015/09/11"
+    # Args:
+    # @date_:字符串，当天的日期，例如："2015/09/11"
     
-    Return:
-    @tuple[0]:布尔值，表示是否是工作日
-    @tuple[1]:字符串，作息时间段
+    # Return:
+    # @tuple[0]:布尔值，表示是否是工作日
+    # @tuple[1]:字符串，作息时间段
     
-    说明：
-    如果返回：(True,'')，则认为是普通的工作日
-              (True,'10:00-17:00'),则按照给定的时间段计算迟到
+    # 说明：
+    # 如果返回：(True,'')，则认为是普通的工作日
+              # (True,'10:00-17:00'),则按照给定的时间段计算迟到
     
-    """
-    date_obj = datetime.strptime(date_, "%Y/%m/%d")
-    # ----9 月份的特殊------------
-    reg_str = date_obj.strftime("%Y/%m/%d")
-    prefix = r'2015/09/'
-    if reg_str in [prefix+x for x in ['03','04']]:
-        return False,''
-    elif reg_str in [prefix+x for x in ['06']]:
-        return True,''
-    # -------------------------------
-    if date_obj.weekday() in [0,1,2,3,4]:         #星期一到星期五是工作日
-        return True,""
-    else:
-        return False,''
+    # """
+    # date_obj = datetime.strptime(date_, "%Y/%m/%d")
+    # # ----9 月份的特殊------------
+    # reg_str = date_obj.strftime("%Y/%m/%d")
+    # prefix = r'2015/09/'
+    # if reg_str in [prefix+x for x in ['03','04']]:
+        # return False,''
+    # elif reg_str in [prefix+x for x in ['06']]:
+        # return True,''
+    # # -------------------------------
+    # if date_obj.weekday() in [0,1,2,3,4]:         #星期一到星期五是工作日
+        # return True,""
+    # else:
+        # return False,''
 
 
 
@@ -74,15 +75,28 @@ def t2i(tstr):
         ls = tstr.split(':')
         return int(ls[0])*60+int(ls[1])
 
-def i2day(hours):
-    if hours == 0:
+def i2day(second):
+    if second == 0:
         return ''
     else:
-        return hours/8.0
+        return second/(8.0*60)
 
-
+def ts2is(src):
+    """ "8:30-12:30  ---> (1234,2324)
+    """
+    mt = re.match(r"(.*)-(.*)",src)
+    if mt:
+        return tuple((t2i(s) for s in src.split("-")))
+    else:
+        return None
     
-def get_worktimes(workshift="8:30-17:30",continueday_overtime="",leave=[],noonrest="12:31-13:29"):
+def ispan2tspan(ispan):
+    if ispan:
+        return "%s-%s"%(i2t(ispan[0]),i2t(ispan[1]))
+    else:
+        return ""
+    
+def get_worktimes(workshift="8:30-17:30",continueday_overtime=0,leave=[],noonrest="12:31-13:29"):
     """获取该员工应该遵守的工作时间表
     
     Args:
@@ -94,27 +108,29 @@ def get_worktimes(workshift="8:30-17:30",continueday_overtime="",leave=[],noonre
     Return:
         @worktimes:字符串列表，该员工应该遵守的工作时间表，格式：["8:30-12:20","13:30-17:30"]
     """
-    worktimes = workshift_to_worktimes(workshift)
-    worktimes = filter_noonrest(worktimes, noonrest)
+    worktimes = [ts2is(workshift)]
+    worktimes = filter_noonrest(worktimes, ts2is(noonrest))
     worktimes = filter_continueday_overtime(worktimes, continueday_overtime)
     worktimes = filter_leave(worktimes, leave)
     return worktimes
 
-def workshift_to_worktimes(workshift):
-    """
-    根据员工的workshift信息，处理worktimes
-    Args:
-    @workshift:字符串，员工作息，格式："8:30-17:30"
-    Return:
-    @worktimes:字符串列表，该员工应该遵守的工作时间表，格式：["8:30-12:20","13:30-17:30"]
-    """
-    worktimes = []
-    mt = re.match(r"(.*)-(.*)",workshift)
-    if mt:
-        worktimes.append(workshift)
-    else:                            # 解析不了都当成 Flexible
-        pass                
-    return worktimes
+# def workshift_to_worktimes(workshift):
+    # """
+    # 根据员工的workshift信息，处理worktimes
+    # Args:
+    # @workshift:字符串，员工作息，格式："8:30-17:30"
+    # Return:
+    # @worktimes:字符串列表，该员工应该遵守的工作时间表，格式：["8:30-12:20","13:30-17:30"]
+    # """
+    # return tspan2ispan(workshift)
+    # worktimes = []
+    # mt = re.match(r"(.*)-(.*)",workshift)
+    # if mt:
+        # # worktimes.append(workshift)
+        # return tspan2ispan(workshift)
+    # else:                            # 解析不了都当成 Flexible
+        # pass                
+    # return worktimes
 
 def filter_noonrest(worktimes, noonrest):
     """
@@ -140,10 +156,10 @@ def filter_continueday_overtime(worktimes, continueday_overtime):
         tmp_worktimes = worktimes
     elif 0< continueday_overtime <= 120:
         for span in worktimes:
-            tmp_worktimes.extend(subtract(span, "6:00-9:59"))      # 把6:00-10：00的时间段去掉，就相当于让员工从10点开始上班了
+            tmp_worktimes.extend(subtract(span, ts2is("6:00-9:59")))      # 把6:00-10：00的时间段去掉，就相当于让员工从10点开始上班了
     else:
         for span in worktimes:
-            tmp_worktimes.extend(subtract(span,"6:00-12:59"))       # 暂时预估，下午上班时间不会早于12:59
+            tmp_worktimes.extend(subtract(span,ts2is("6:00-12:59")))       # 把"6:00-12:59的时间段去掉，相当于上午不上班。--预估，下午上班时间不会早于12:59
     worktimes = tmp_worktimes
     return worktimes
 
@@ -170,12 +186,43 @@ def time_range(worktimes):
     Return:
     start,end:时间段列表的开始，结束时间。格式:"8:30","17:30"
     """
-    if worktimes == []:
-        return -1,-1
+    if worktimes==[]:
+        return 0,0
     else:
-        start = worktimes[0].split("-")[0]
-        end = worktimes[-1].split("-")[1]
-        return t2i(start),t2i(end)
+        return worktimes[0][0],worktimes[-1][-1]
+    # if worktimes == []:
+        # return -1,-1
+    # else:
+        # start = worktimes[0].split("-")[0]
+        # end = worktimes[-1].split("-")[1]
+        # return t2i(start),t2i(end)
+
+# def may_str(func):
+    # def _func(*args,**kw):
+        # out_arg=[]
+        # for i in args:
+            # if isinstance(i,str):
+                # mt = re.match(r"(.*)-(.*)",i)
+                # if mt:
+                    # out_arg.append(tspan2ispan(i))
+                # else:
+                    # out_arg.append(t2i(i))
+            # else:
+                # out_arg.append(i)
+        # for k,v in kw.items():
+            # if isinstance(v,str):
+                # mt = re.match(r"(.*)-(.*)",v)
+                # if mt:
+                    # kw[k]= tspan2ispan(v)
+                # else:
+                    # kw[k]=t2i(v)
+        # rt = func(*out_arg,**kw)
+        # if isinstance(rt,(list,tuple)):
+            # return ispan2tspan(rt)
+        # else:
+            # return i2t(rt)
+    # return _func
+
 
 def subtract(src,target):
     """时间段src减去target时间段
@@ -193,38 +240,42 @@ def subtract(src,target):
     如果src: "8：30-17:30",target:"13:30-17:30",相减后得:["8:30-13:29"]
     
     """
-    src_start =Time.strptime(src.split("-")[0])
-    src_end = Time.strptime(src.split("-")[1])
-    target_start = Time.strptime(target.split("-")[0])
-    target_end = Time.strptime(target.split("-")[1])
+    # src_start =t2i(src.split("-")[0])
+    # src_end = t2i(src.split("-")[1])
+    # target_start = t2i(target.split("-")[0])
+    # target_end = t2i(target.split("-")[1])
+    src_start,src_end = src
+    target_start,target_end = target
     span=[]
     if src_start < target_start:
         if src_end < target_start:
             span.append((src_start,src_end))
         elif target_start <= src_end < target_end:
-            span.append((src_start,target_start-Time(0,1)))     # 将请假的开始点从工作段去掉
+            span.append((src_start,target_start-1))     # 将开始点从工作段去掉
         elif target_end == src_end:
-            span.append((src_start,target_start-Time(0,1)))
+            span.append((src_start,target_start-1))
         elif target_end < src_end:
-            span.append((src_start,target_start-Time(0,1)))
-            span.append((target_end+Time(0,1),src_end))
+            span.append((src_start,target_start-1))
+            span.append((target_end+1,src_end))
     elif target_start <= src_start<= target_end:
         if src_end <= target_end:     # 时间段被减完了，pass就代表就让span列表为空
             pass
         elif target_end < src_end:
-            span.append((target_end+Time(0,1),src_end))
+            span.append((target_end+1,src_end))
     elif target_end < src_start:
         span.append((src_start,src_end))
     
+    return span
+    
     # -----------剔除那些 5分钟内的问题时间段，因为不太可能有5分钟的工作时间段，而且还能使临界点的处理更安全
     #            如果临界点处理好了，可以考虑去掉该段代码
-    timespan=[]
-    for start,end in span:
-        if end - start >= Time(0,5):
-            timespan.append("-".join([str(start),str(end)]))
+    # timespan=[]
+    # for start,end in span:
+        # if end - start >= Time(0,5):
+            # timespan.append("-".join([str(start),str(end)]))
             
-    timespan=["-".join([str(start),str(end)]) for start,end in span]
-    return timespan
+    # timespan=["-".join([str(start),str(end)]) for start,end in span]
+    # return timespan
 
 
 
@@ -441,23 +492,17 @@ def get_absent(workstart,workleave):
     Return:
     旷工小时数
     """
-    if workstart ==0:
-        return 8
-    elif workstart == workleave:
-        return 4
+    if workstart ==0:           #没有打卡记录
+        return 8*60
+    elif workstart == workleave:    # 只有一次打卡记录
+        return 4*60
     else:
         return 0
-    # if Time.strptime(workstart) == Time(0):   #没有打卡记录
-        # return 8
-    # elif Time.strptime(workstart) == Time.strptime(workleave): # 只有一次打卡记录
-        # return 4
-    # else:
-        # return 0
 
 # --------------------------------------------------------------------------------------------------------------------------
 # 计算考勤统计表
 
-def report_max_workhours(days):
+def report_max_worktime(days):
     """
     所有员工中，当月应该上班的最大天数。
     普通员工应该上班的天数一般都是最大天数，
@@ -468,36 +513,38 @@ def report_max_workhours(days):
         workday,_ =is_workday(day)
         if workday:
             cnt+=1
-    return cnt*8    
+    return cnt*8*60  
 
-def report_expect_workhours(days,empid):
+def report_expect_worktime(days,empid):
     """根据员工id，日期，计算员工应该上班的天数
     例如，9月7日入职的员工，他应该上班的时间就不包括9.1-9.6
+    这个，可能需要单独来设置！
+    现在暂时这么写
     """
     cnt=0
     for day in days:
         workday,_ =is_workday(day)
         if workday:
             cnt+=1
-    return cnt*8
+    return cnt*8*60
 
-def report_act_workhours(exp_workhours,person_leave,sick_leave,absent):
+def report_act_worktime(exp_worktime,person_leave,sick_leave,absent):
     """实际工作小时数
     @exp_workday:应该上班的天数
     """
-    return exp_workhours - person_leave - sick_leave - absent
+    return exp_worktime - person_leave - sick_leave - absent
 
-def report_allow_hours(exp_workhours,allow_sub_hours):
+def report_allowtime(exp_worktime,allow_subtime):
     """补贴小时数
     """
-    return exp_workhours - allow_sub_hours
+    return exp_worktime - allow_subtime
 
-def report_allow_sub_hours(person_leave,sick_leave,annual_leave,other_paid_leave,over_late3_days):
-    """补贴扣除天数
+def report_allow_subtime(person_leave,sick_leave,annual_leave,other_paid_leave,over_late3_days):
+    """补贴扣除时间
     """
-    return person_leave+sick_leave+annual_leave+other_paid_leave+over_late3_days*8
+    return person_leave+sick_leave+annual_leave+other_paid_leave+over_late3_days*8*60
 
-def report_leave_hours(person_leave,sick_leave,annual_leave,other_paid_leave,swap_off):
+def report_leavetime(person_leave,sick_leave,annual_leave,other_paid_leave,swap_off):
     """请假总天数
     """
     return person_leave+sick_leave+annual_leave+other_paid_leave+swap_off
@@ -555,36 +602,38 @@ if __name__ =='__main__':
     import unittest
     class RecordTest(unittest.TestCase):
         def test_subtract(self):
-            self.assertEqual(subtract("8:30-12:30","10:30-12:30"),["8:30-10:29"])    # 后端临界
-            self.assertEqual(subtract("8:30-12:30","8:30-10:30"),["10:31-12:30"])     # 前段临界
-            self.assertEqual(subtract("8:30-12:30","8:30-12:30"),[])     # 前后临界
-            self.assertEqual(subtract("8:30-12:30","9:00-11:00"),["8:30-8:59","11:01-12:30"])     # 中间段
+            self.assertEqual(subtract(ts2is("8:30-12:30"),ts2is("10:30-12:30")),[ts2is("8:30-10:29")])    # 后端临界
+            self.assertEqual(subtract(ts2is("8:30-12:30"),ts2is("8:30-10:30")),[ts2is("10:31-12:30")])     # 前段临界
+            self.assertEqual(subtract(ts2is("8:30-12:30"),ts2is("8:30-12:30")),[])     # 前后临界
+            self.assertEqual(subtract(ts2is("8:30-12:30"),ts2is("9:00-11:00")),[ts2is("8:30-8:59"),ts2is("11:01-12:30")])     # 中间段
             
             # 下面是不太可能出现的情况，
-            self.assertEqual(subtract("8:30-12:30","13:30-17:30"),['8:30-12:30'])    # 不相交
-            self.assertEqual(subtract("13:30-17:30", "8:30-12:30"),['13:30-17:30'])
+            self.assertEqual(subtract(ts2is("8:30-12:30"),ts2is("13:30-17:30")),[ts2is('8:30-12:30')])    # 不相交
+            self.assertEqual(subtract(ts2is("13:30-17:30"),ts2is("8:30-12:30")),[ts2is('13:30-17:30')])
             
-            self.assertEqual(subtract("8:30-12:30","9:30-13:30"),["8:30-9:29"]) 
-            self.assertEqual(subtract("13:31-17:30","16:00-17:30"),["13:31-15:59"])  
+            self.assertEqual(subtract(ts2is("8:30-12:30"),ts2is("9:30-13:30")),[ts2is("8:30-9:29")]) 
+            self.assertEqual(subtract(ts2is("13:31-17:30"),ts2is("16:00-17:30")),[ts2is("13:31-15:59")])  
             
         def test_filter_leave(self):
-            self.assertEqual(filter_leave(["8:30-12:30","13:30-17:30"], ["9:00-11:00"]),["8:30-8:59",'11:01-12:30',"13:30-17:30"])
-            self.assertEqual(filter_leave(["8:30-12:30","13:30-17:30"],["9:00-16:00"]),['8:30-8:59','16:01-17:30'])  
+            self.assertEqual(filter_leave([ts2is("8:30-12:30"),ts2is("13:30-17:30")], [ts2is("9:00-11:00")]),[ts2is("8:30-8:59"),ts2is('11:01-12:30'),ts2is("13:30-17:30")])
+            self.assertEqual(filter_leave([ts2is("8:30-12:30"),ts2is("13:30-17:30")],[ts2is("9:00-16:00")]),[ts2is('8:30-8:59'),ts2is('16:01-17:30')])  
             
         def test_fiter_noonrest(self):
-            self.assertEqual(filter_noonrest(["8:30-17:30"],"12:30-13:30"),["8:30-12:29","13:31-17:30"])   
+            self.assertEqual(filter_noonrest([ts2is("8:30-17:30")],ts2is("12:30-13:30")),[ts2is("8:30-12:29"),ts2is("13:31-17:30")])   
             
         def test_filter_overtime(self):
-            self.assertEqual(filter_continueday_overtime(["8:30-12:30","13:30-17:30"],"1:30"),["10:00-12:30","13:30-17:30"])   
+            self.assertEqual(filter_continueday_overtime([ts2is("8:30-12:30"),ts2is("13:30-17:30")],t2i("1:30")),[ts2is("10:00-12:30"),ts2is("13:30-17:30")])   
             
         def test_get_worktimes(self):
-            self.assertEqual(get_worktimes(),['8:30-12:30','13:30-17:30'])
-            self.assertEqual(get_worktimes(continueday_overtime="2:30"),["13:30-17:30"])
-            self.assertEqual(get_worktimes(leave=["9:00-11:00","16:00-17:30"]),['8:30-8:59',"11:01-12:30","13:30-15:59"])
-            self.assertEqual(get_worktimes(leave=["13:30-17:30"],continueday_overtime="2:30"),[])  
+            self.assertEqual(get_worktimes(),[ts2is('8:30-12:30'),ts2is('13:30-17:30')])
+            self.assertEqual(get_worktimes(continueday_overtime=t2i("2:30")),[ts2is("13:30-17:30")])
+            self.assertEqual(get_worktimes(leave=[ts2is("9:00-11:00"),ts2is("16:00-17:30")]),[ts2is('8:30-8:59'),ts2is("11:01-12:30"),ts2is("13:30-15:59")])
+            self.assertEqual(get_worktimes(leave=[ts2is("13:30-17:30")],continueday_overtime=t2i("2:30")),[])  
         
             
     unittest.main()
     # print( i2t(100) )
     # print(t2i("8:30"))
     # print(i2t(510))
+    # print(subtract(tspan2ispan("8:30-12:30"),tspan2ispan("10:30-12:30")))
+    # print([tspan2ispan("8:30-10:29")])
