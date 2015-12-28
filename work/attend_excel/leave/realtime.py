@@ -1,3 +1,4 @@
+# -*- encoding:utf8 -*-
 
 class TimeBlock(object):
     owner =

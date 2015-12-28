@@ -2,7 +2,7 @@
 import requests
 
 def main():
-    crt_token = 'WmtQg794U4GoAIP6MvW54o0hfjiAd_B4kYahfU-ZG0ag9H9qjkP3ob_olivBaYt7luX4iNfXUV_MbeIqEpKro7GOiw-aFsuiB5-mxqUhYygOZRdAGAZKC'
+    crt_token = '920XNa9MArHcj6VIqGq-8yTNraig-Oj8iwlcEQLFLuq1BZ1Ex5igZRDTf_fxp4df8hchxXYYwXEqT7zVG8JL-T48Q-FBFp5PVi9mifJ5DjwNHPjACAJDL'
     # access_token()
     # 发送文件到服务器
     #send_media(crt_token,'image',r'D:\try\imgproc\test1.jpg')
@@ -16,20 +16,24 @@ def main():
     # for i in range(50):
         # test_local()
     #抢答
-    test_local()
+    # test_local()
     
-    # send(crt_token)
+    send(crt_token)
 
 
 def access_token():
     '''获取accses_token,
     appid=wx7080c32bd10defb0&secret=d4624c36b6795d1d99dcf0547af5443d
-    9Qi5G3iunWcAagJ3jvBWitJb8p6KpzzBRREPVIXng4_ENvtDft-PtWMJxbhxDQMNBFuKQDkPhakJi-R2dyBLOaBhuR6EhrMIC5MKpbifOHwFOEjAGABKA
+
     曾经获得的一个：
     "type":"image","media_id":"ZWx3LgGb3jRu79rGlnVKW9SDE-hRjCrBh5IJ91nCiX9VcYA4N-8FYfq24opF6A05"
     '''
-    appid = 'wx7080c32bd10defb'
-    secret='d4624c36b6795d1d99dcf0547af5443d'
+    myappid='wx7080c32bd10defb'
+    mysecret= 'd4624c36b6795d1d99dcf0547af5443d'
+    mokiappid='wx4caa217911a92dbd'
+    mokisecret='257666d2ee35c47df38f4f6dd759813e'
+    appid = mokiappid
+    secret=mokisecret
     #moki
     # appid = 'wx4caa217911a92dbd'
     # secret = '257666d2ee35c47df38f4f6dd759813e'
@@ -105,13 +109,14 @@ def send_group(token):
 
 
 def send(token):
+    #"content": "点击我(https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx7080c32bd10defb0&redirect_uri=http%3a%2f%2fcoblan.sinaapp.com%2fnianhui%2fgetuser%2f&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect)"
     url = r'https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token='+token
     #post数据格式
     data= """
     {
-        "touser": "o6hHBv1AfKq8rH5LAY6AY_gHbQrc", 
+        "touser": "olEWajpji6FqC5twaXFV7S929AnQ", 
         "text": {
-            "content": "点击我(https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx7080c32bd10defb0&redirect_uri=http%3a%2f%2fcoblan.sinaapp.com%2fnianhui%2fgetuser%2f&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect)"
+            "content": "点击我(https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx4caa217911a92dbd&redirect_uri=http%3a%2f%2fwechat.mokitech.com%2fnianhui%2fjiemu%2f&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect)"
         }, 
         "msgtype": "text"
     }
