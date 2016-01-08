@@ -283,7 +283,7 @@ def test_qiangda():
 def test_qiangda_many():
     url= "http://wechat.mokitech.com/nianhui/weixin/"
     # url = 'http://127.0.0.1:8000/nianhui/weixin/'
-    content= '测试抢答'
+    content= "这里是内容/::'(/::-|/::+/::$/:--b\xee\x90\x95\xee\x90\x8c\xee\x90\x92"
     for openid in employee:
         mock_usertextMsg(openid, url, content)
 
@@ -292,6 +292,6 @@ if __name__ =='__main__':
     
     # access_token()
     # test_qiangda()
-    # test_qiangda_many()
-    send("t10ZdyaofDB3ocdwstLTyX-K85jCAAopaG0XKnioEd_031kSXlj7jqsYJTH2gPG-rvdOzEmcRNnTCyRhxwV4SEXPRTCMd_xUhwJ-QbdrvtEHNIjACAWCX")
+    test_qiangda_many()
+    # send("t10ZdyaofDB3ocdwstLTyX-K85jCAAopaG0XKnioEd_031kSXlj7jqsYJTH2gPG-rvdOzEmcRNnTCyRhxwV4SEXPRTCMd_xUhwJ-QbdrvtEHNIjACAWCX")
     

@@ -51,8 +51,8 @@ def add_menu():
            "sub_button":[
            {	
                "type":"view",
-               "name":"年会节目主界面测试2",
-               "url":"https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx7080c32bd10defb0&redirect_uri=http%3a%2f%2fwechat.mokitech.com%2fnianhui%2fjiemu%2f&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect"
+               "name":"年会节目主界面测试1",
+               "url":"https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx7080c32bd10defb0&redirect_uri=http%3a%2f%2fcoblan.sinaapp.com%2fnianhui%2fjiemu%2f&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect"
             },
             ]
        }]

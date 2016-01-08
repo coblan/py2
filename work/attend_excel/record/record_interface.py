@@ -1,4 +1,20 @@
 # -*- encoding:utf8 -*-
+"""
+暂时虚拟的函数
+======================================
+attend_num_to_empid(attend_number):根据考勤号，返回员工号.TMS提供。之所以使用该函数，是考虑到员工号比考勤号通用，在tms中查询数据时，利用员工号进行查询。
+get_workshift(empid):根据empid员工号，返回员工的规定作息
+get_worktype(empid):根据empid，返回员工的工作类型，如'FTE'
+get_leave(empid,date_) ,获取员工请假情况,返回【假期对象】列表，
+                      每个【假期对象】必须有timespan()方法，用于返回假期的时间段，例如:"8:30-12:30"
+                      必须有type()方法，返回假期类型，如：'person leave','sick leave','annual leave','other paid leave','swap off'
+                      
+
+save_attend(),预留，将数据保存到TMS中
+get_month_end_overtime(empid,date)  获取date所在月末，该员工的加班情况
+
+is_workday 获取当日是否为工作日，当日的workshift
+"""
 from datetime import datetime
 import sys
 sys.path.append('..')
@@ -6,17 +22,21 @@ from tms import get_workshift,get_worktype,attend_num_to_empid
 
 # def attend_num_to_empid(attend_num):
     # return 'A1000'
+    
 # def get_worktype(empid):
     # return 'FTE'
+    
 def get_month_end_overtime(empid,month):
     return 0
+
 def save_attend(records,reports):
     pass
+
 # def get_workshift(empid):
     # return "8:30-17:30"
+    
 def get_leave(empid,date_):
     return []
-
 
 def is_workday(date_):
     """判断是否工作日，

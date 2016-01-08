@@ -7,7 +7,7 @@
 
 处理流程
 ===============================================
-main()是主函数，从main开始执行。
+main()是主函数，main的执行步骤大致如下。
 1. 调用excel.get_attend_list(path)生成器
    该生成器，从path指定的原始考勤记录excel03文件读取数据，每次返回一个员工的当月所有考勤记录。
    返回的数据结构,见函数文档
@@ -34,17 +34,9 @@ main()是主函数，从main开始执行。
 外部接口
 (现在暂时调用record_interface.py中的临时函数)
 ===============================================
-需要外部提供的函数,
-attend_num_to_empid(attend_number):根据考勤号，返回员工号.TMS提供。之所以使用该函数，是考虑到员工号比考勤号通用，在tms中查询数据时，利用员工号进行查询。
-get_workshift(empid):根据empid员工号，返回员工的规定作息
-get_worktype(empid):根据empid，返回员工的工作类型，如'FTE'
-get_leave(empid,date_) ,获取员工请假情况,返回【假期对象】列表，
-                      每个【假期对象】必须有timespan()方法，用于返回假期的时间段，例如:"8:30-12:30"
-                      必须有type()方法，返回假期类型，如：'person leave','sick leave','annual leave','other paid leave','swap off'
-                      
+需要外部提供的函数,见record_interface.py
 
-save_attend(),预留，将数据保存到TMS中
-get_month_end_overtime(empid,date)  获取date所在月末，该员工的加班情况
+
 """
 import re
 from datetime import datetime,date,timedelta
@@ -97,6 +89,8 @@ def main(read_path,write_path=''):
         reports.append(report)
         
     # ---------------------生成Excel--------可能是以后不再生成excel-----------------------------------
+    if not write_path:
+        return
     wb,record_sheet,report_sheet =gen_attend_excel()
     record_sheet.append([u'考勤号',u'名字',u'日期',u'上班时间',u'下班时间',
                          u'工作时长',u'迟到等级',u'个人迟到时间',u'团队迟到时间',u'加班',
