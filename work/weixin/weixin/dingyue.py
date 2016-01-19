@@ -2,7 +2,7 @@
 import requests
 
 def main():
-    crt_token = '920XNa9MArHcj6VIqGq-8yTNraig-Oj8iwlcEQLFLuq1BZ1Ex5igZRDTf_fxp4df8hchxXYYwXEqT7zVG8JL-T48Q-FBFp5PVi9mifJ5DjwNHPjACAJDL'
+    crt_token = 'Eo1Df_nzwyiVKH2IpfHrfjhj_yBpaPBgY9wCh8hgbYZrdMg2bWZ7aAiF-9iFy6fOYAYHx4d5kY5gv5iUYL5quLDNwcLzrqim8K92q1Qmq7UGNJcAFASZV'
     # access_token()
     # 发送文件到服务器
     #send_media(crt_token,'image',r'D:\try\imgproc\test1.jpg')
@@ -11,14 +11,14 @@ def main():
     #send_txt_media(crt_token)
     #send_group(crt_token)
     
-    # add_menu(crt_token)
+    add_menu(crt_token)
     
     # for i in range(50):
         # test_local()
     #抢答
     # test_local()
     
-    send(crt_token)
+    # send(crt_token)
 
 
 def access_token():
@@ -28,7 +28,7 @@ def access_token():
     曾经获得的一个：
     "type":"image","media_id":"ZWx3LgGb3jRu79rGlnVKW9SDE-hRjCrBh5IJ91nCiX9VcYA4N-8FYfq24opF6A05"
     '''
-    myappid='wx7080c32bd10defb'
+    myappid='wx7080c32bd10defb0'
     mysecret= 'd4624c36b6795d1d99dcf0547af5443d'
     mokiappid='wx4caa217911a92dbd'
     mokisecret='257666d2ee35c47df38f4f6dd759813e'
@@ -37,7 +37,7 @@ def access_token():
     #moki
     # appid = 'wx4caa217911a92dbd'
     # secret = '257666d2ee35c47df38f4f6dd759813e'
-    rq = requests.get('https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid='+appid+'&secret='+secret)
+    rq = requests.get('https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid='+myappid+'&secret='+mysecret)
     print(rq.text) 
     
 def send_media(token,type_,file_):
@@ -125,7 +125,7 @@ def send(token):
     print(rq.text)
     
 
-def add_menu(token):
+# def add_menu(token):
     '添加菜单'
     url = r"https://api.weixin.qq.com/cgi-bin/menu/create?access_token="+token
     data ="""
@@ -181,7 +181,7 @@ def test_local():
 <FromUserName><![CDATA[olEWajiSzMCHUkqNue5zMg43gvKM]]></FromUserName>
 <CreateTime>1446453151</CreateTime>
 <MsgType><![CDATA[text]]></MsgType>
-<Content><![CDATA[这里是内容]]></Content>
+<Content><![CDATA[这里是内容/::'(/::-|/::+/::$/:--b\xee\x90\x95\xee\x90\x8c\xee\x90\x92]]></Content>
 </xml>
     """    
     headers = {'content-type': 'text/xml'}
