@@ -5,14 +5,14 @@ import re
 import sys
 from PyQt4.Qsci import QsciStyle
 import const
-if 0:
-    from bridge import Bridge
+#if 0:
+    #from bridge import CodeEditor
     
-def QcolorToRGB(color):
-    r = color.red()
-    g = color.green()
-    b = color.blue()
-    return (r | g << 8 | b << 16)
+#def QcolorToRGB(color):
+    #r = color.red()
+    #g = color.green()
+    #b = color.blue()
+    #return (r | g << 8 | b << 16)
 
 class AdaptLexer(QObject):
     """Lexer基类，构造函数直接 将lexer插在editor上
@@ -26,7 +26,7 @@ class AdaptLexer(QObject):
         super(AdaptLexer,self).__init__(editor)
         self.editor = editor
         if 0: 
-            assert isinstance(editor, Bridge)    
+            assert isinstance(editor, CodeEditor)    
     
 
     def hightText(self, start, end):
@@ -75,8 +75,8 @@ class AdaptLexer(QObject):
 
         #self.setFormat(end, end + 1, number)
     
-    def setForeColor(self,n,QColor):
-        color = QcolorToRGB(QColor)
+    def setForeColor(self,n,color):
+        #color = QcolorToRGB(QColor)
         self.editor.send(const.SCI_STYLESETFORE, n, color)
     def send(self,*args,**kw):
         return self.editor.SendScintilla(*args,**kw)

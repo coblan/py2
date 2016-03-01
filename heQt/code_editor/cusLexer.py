@@ -6,7 +6,7 @@ import sys
 from PyQt4.Qsci import QsciStyle
 import const
 if 0:
-    from bridge import Bridge
+    from bridge import CodeEditor
     
 def QcolorToRGB(color):
     r = color.red()
@@ -26,7 +26,7 @@ class CusLexer(QObject):
         super(CusLexer,self).__init__(editor)
         self.editor = editor
         if 0: 
-            assert isinstance(editor, Bridge)    
+            assert isinstance(editor, CodeEditor)    
     
 
     def hightText(self, start, end):
@@ -75,8 +75,8 @@ class CusLexer(QObject):
 
         self.setFormat(end, end + 1, number)
     
-    def setForeColor(self,n,QColor):
-        color = QcolorToRGB(QColor)
+    def setForeColor(self,n,color):
+        #color = QcolorToRGB(QColor)
         self.editor.send(const.SCI_STYLESETFORE, n, color)
     def send(self,*args,**kw):
         return self.editor.SendScintilla(*args,**kw)
@@ -95,5 +95,5 @@ class Hello(CusLexer):
     def hightText(self, start, end):
         self.setFormat(start, end, 32)
         text = self.editor.textRange(start, end)
-        for i in re.finditer('hello', text):
+        for i in re.finditer('hello|fuck', text):
             self.setFormat( start+i.start(),start+i.end(),18)

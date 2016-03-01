@@ -1,9 +1,6 @@
 # -*- encoding:utf8 -*-
 from PyQt4.QtGui import QListView,QStandardItemModel
 from PyQt4.QtCore import Qt
-
-if 0:
-    from bridge import Bridge
 import re,pickle
 
 class Autocompleter(QListView):

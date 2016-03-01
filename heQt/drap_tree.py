@@ -1,11 +1,26 @@
+# -*- encoding:utf8 -*-
 from heQt.qteven import *
+from PyQt4.QtGui import *
+from PyQt4.QtCore import *
 import pickle
 import re
-from qt_.widget.tabWidget_.barBase import BarBase
-from struct_.cls import sub_obj_call, add_sub_obj
+from heStruct.cls import add_sub_obj,sub_obj_call
 
-class TabWidgetBase(QTabWidget):
+
+class DockTab(QTabWidget):
     """
+    
+    默认增加功能：
+    1 迭代窗口
+    2 保存，恢复所有能够pickle的窗口
+    
+    重要函数：
+    enableCrossDrag(Bar<-cls)           开启夸窗口拖拽功能
+    enableChineseDirection(Bar<-cls)    开启中文调整方向功能
+    
+    注意：这两个函数的参数是Bar的子类，不是Bar的对象
+  
+    
     默认向QTabWidget增加的功能：
     1 迭代窗口a
     2 保存，恢复所有能够pickle的窗口
@@ -17,91 +32,62 @@ class TabWidgetBase(QTabWidget):
     
     """
     def __init__(self, *args):
-        super(TabWidgetBase,self).__init__( *args)
-        self.bar=cusBar(self)
-        self.setTabBar(self.bar)
-        self.bar.enable_chinese_direction()
-        
+        super(DockTab,self).__init__( *args)
+        self.enableCrossDrag()
         self.tabCloseRequested.connect(self.removeTab)
 
-    #def enableCrossDrag(self, cusBar = BarBase):
-        #"""注意：cusBar是BarBase<-Bar的子类，**不是** 类对象"""
-        #if not hasattr(self, "cusBar"):
-            #self.cusBar = cusBar(self)
-            #self.setTabBar(self.cusBar)
-        #self.cusBar.enableCrossDrag()
-        #self.crossDrag = _crossDrag(self, self.cusBar.comDrag)
+    def enableCrossDrag(self):
+        """"""
+        self.bar=BarBase(self)
+        self.setTabBar(self.bar)
+        self.crossDrag = TabWidget_crossDrag(self)
+        self.crossDrag.drag_finish.connect(self.bar.comDrag.clear_line)
+        self.crossDrag.drag_ing.connect(self.bar.comDrag.drawLine)
+        add_sub_obj(self,self.crossDrag)
+   
+    @sub_obj_call
+    def dragEnterEvent(self, event):
+        pass
+    
+    @sub_obj_call
+    def dropEvent(self, event):
+        pass 
+    
+    @sub_obj_call
+    def dragMoveEvent(self, event):
+        super(DockTab,self).dragMoveEvent(event)
         
-    #def enableChineseDirection(self, cusBar = BarBase):
-        #if not hasattr(self, "cusBar"):
-            #self.cusBar = cusBar(self)
-            #self.setTabBar(self.cusBar) 
-        #self.cusBar.enableChineseDirection()
-        
-    #@sub_obj_call
-    #def dragEnterEvent(self, event):
-        #pass
-    
-    #@sub_obj_call
-    #def dropEvent(self, event):
-        #pass 
-    
-    #@sub_obj_call
-    #def dragMoveEvent(self, event):
-        #super().dragMoveEvent(event)
-        
-    #@sub_obj_call
-    #def dragLeaveEvent(self, event):
-        #pass   
-    
-    ##[1] 迭代窗口
-    #def __iter__(self):
-        #self.iterIndex=-1
-        #return self    
-    #def __next__(self):
-        #self.iterIndex += 1
-        #if self.iterIndex < self.count():
-            #return self.widget( self.iterIndex )
-        #raise StopIteration    
-    
+    @sub_obj_call
+    def dragLeaveEvent(self, event):
+        pass   
+     
+    def get_wins(self):
+        crt_index=0
+        while crt_index < self.count():
+            yield self.widget( crt_index )
+            crt_index += 1
+                    
+
     #[2] 添加窗口，添加标签名，将名字标签名保存在windowTitle中
-    def addTab(self, widget, name_icon = "", name = ""):
-        widget.tabWidget_ = self
-        if isinstance(name_icon, QIcon):
-            widget.setWindowTitle(name)
-            if self.isNeedTurnDirection(name):
-                return super().addTab(widget, name_icon)
-            else:
-                return super().addTab(widget, name_icon, name)
+    def addTab(self, widget, name = ""):
+        widget.setWindowTitle(name)
+        if self.isNeedTurnDirection(name):
+            return super(DockTab,self).addTab(widget, "")
         else:
-            widget.setWindowTitle(name_icon)
-            if self.isNeedTurnDirection(name_icon):
-                return super().addTab(widget, "")
-            else:
-                return super().addTab(widget, name_icon)
+            return super(DockTab,self).addTab(widget, name)
             
     def isNeedTurnDirection(self, text):
         if self.tabPosition() != QTabWidget.North:
             if re.search(u'[\u4e00-\u9fa5]+',text):
                 return True
-            #if not re.match("^[A-Za-z]", text):
-                #return True
         return False   
     
-    def insertTab(self, index, widget, name_icon , name = None):
-        widget.tabWidget_ = self
-        if isinstance(name_icon, QIcon):
-            widget.setWindowTitle(name)
-            if self.isNeedTurnDirection(name):
-                super().insertTab(index, widget, name_icon)
-            else:
-                super().insertTab(index, widget, name_icon, name)
+    def insertTab(self, index, widget, name):
+        widget.setWindowTitle(name)
+        if self.isNeedTurnDirection(name):
+            super(DockTab,self).insertTab(index, widget, "")
         else:
-            widget.setWindowTitle(name_icon)
-            if self.isNeedTurnDirection(name_icon):
-                super().insertTab(index, widget, "")
-            else:
-                super().insertTab(index, widget, name_icon)    
+            super(DockTab,self).insertTab(index, widget, name)    
                 
     def removeWidget(self, widget):
         index = self.indexOf(widget)
@@ -153,110 +139,144 @@ class TabWidgetBase(QTabWidget):
         byte = pickle.dumps( {'wins': ls } )
         return QByteArray(byte)
 
-    def isNeedTurnDirection(self, text):
-        """sub_obj .hook 函数"""
-        return False
-
     def setTabPosition(self, pos):
-        super().setTabPosition( pos)
+        super(DockTab,self).setTabPosition( pos)
         index = -1
-        for win in self:
+        for win in self.get_wins():
             index += 1
             title = win.windowTitle()
             if self.isNeedTurnDirection(title):
-                self.setTabText(index, "")    
+                self.setTabText(index, "")  
+                
+                
+class TabWidget_crossDrag(QObject):
+    """与bar的_crossDrag组件一起构成了Tabwidget的拖拽功能
+    
+    """
+    drag_finish=pyqtSignal()
+    drag_ing=pyqtSignal(int)
+    def __init__(self, tabwidget):
+        super(TabWidget_crossDrag,self).__init__(tabwidget)
+        self.tabwidget = tabwidget
+        tabwidget.setAcceptDrops(True)
+        add_sub_obj(tabwidget, self)
+
+    def dragEnterEvent(self, event):
+        event.acceptProposedAction()
+        
+    def dropEvent(self, event):
+        mime = event.mimeData()
+        self.tabwidget.addTab(mime.win, mime.win.windowTitle() ) 
+        self.drag_finish.emit()
+        self.tabwidget.tabBar().update()   
+        
+    def dragMoveEvent(self, event):
+        self.drag_ing.emit(-1)  # 标识线显示在最后一个标签，表示拖过来的窗口放在最后面
+        
+    def dragLeaveEvent(self, event):
+        self.drag_finish.emit()
+        self.tabwidget.tabBar().update()  
+        
         
 class BarBase(QTabBar):
-    """用在TabWidgetBase中，用来增加功能，比如调整中文方向，垮窗口拖动标签"""
+    """用在TabWidgetBase中，用来增加功能，比如调整中文方向，垮窗口拖动标签
+    
+        用在TabWidget.enableCrossDrag的参数中
+    因为跨窗口拖动和调整中文方向，都需要更改QTableWidget.tabbar对象的行为，所以自定义了这个Bar，在enableXXX中会自动替换原tabbar。
+    可以被继承实现更多功能
+    """
     def __init__(self, p , *args):
         super(BarBase,self).__init__(p, *args)
         self.tabwidget = p
         self.tabHigh = 20
-
-    def enableChineseDirection(self):
         self.comChinese = _ChineseDirection(self)
-        #add_sub_obj(self, self.comChinese)
-    
-    def enableCrossDrag(self):
-        self.comDrag = _crossDrag(self)
-        self.comDrag.install()
-       
- 
-    def mouseMoveEvent(self, event):
-        super().mouseMoveEvent(event)
+        self.comDrag = Bar_crossDrag(self)
         
+        add_sub_obj(self,self.comChinese)
+        add_sub_obj(self,self.comDrag)
+
+    @sub_obj_call
+    def mouseMoveEvent(self, event):
+        super(BarBase,self).mouseMoveEvent(event)
+    
     @sub_obj_call
     def mousePressEvent(self, event):
-        super().mousePressEvent(event)
-    @sub_obj_call      
+        super(BarBase,self).mousePressEvent(event)
+    
+    @sub_obj_call
     def dragMoveEvent(self, event):
-        super().dragMoveEvent(event)
+        super(BarBase,self).dragMoveEvent(event)
+        #self.comDrag.dragMoveEvent(event)
+    
     @sub_obj_call
     def dragEnterEvent(self, event):
-        pass
+        self.comDrag.dragEnterEvent(event)
+    
     @sub_obj_call
     def dragLeaveEvent(self, event): 
         pass
+        #self.comDrag.dragLeaveEvent(event)
+    
     @sub_obj_call
     def dropEvent(self, event):
         pass
+        #self.comDrag.dropEvent(event)
+    
     @sub_obj_call
     def paintEvent(self, event):
-        super().paintEvent(event)
-        if hasattr(self,'comChinese'):
-            self.comChinese.paint()
-        
+        super(BarBase,self).paintEvent(event)
+   
         
 class _ChineseDirection(QObject):
     """能够调整中文的方向"""
     def __init__(self, bar):
         self.tabwidget = bar.tabwidget
         self.bar = bar
-        self.tabwidget.isNeedTurnDirection = self.isNeedTurnDirection
+        #self.tabwidget.isNeedTurnDirection = self.isNeedTurnDirection
         self.old_bar_tabSizeHint = self.bar.tabSizeHint
         self.bar.tabSizeHint = self.tabSizeHint
         
-    def isNeedTurnDirection(self, text):
-        if self.tabwidget.tabPosition() != QTabWidget.North:
-            if not re.match("^[A-Za-z]", text):
-                return True
-        return False   
+    #def isNeedTurnDirection(self, text):
+        #if self.tabwidget.tabPosition() != QTabWidget.North:
+            #if not re.match("^[A-Za-z]", text):
+                #return True
+        #return False 
+    
     def tabSizeHint(self, index):
         win = self.tabwidget.widget(index)
-        if not self.isNeedTurnDirection(win.windowTitle()):
+        if not self.tabwidget.isNeedTurnDirection(win.windowTitle()):
             return self.old_bar_tabSizeHint(index)  
-
         size = QSize()
         size.setHeight(self.bar.fontMetrics().height() * len(win.windowTitle()))
-        size.setWidth(20)
+        size.setWidth(25)
         size.setHeight(size.height() + 20)
         return size
     
-    def paint(self):
+    def paintEvent(self,event):
         painter = QPainter(self.bar)
 
         # 单独画中文
-        for win in self.tabwidget:
+        for win in self.tabwidget.get_wins():
             tooltip = win.windowTitle()
-            if self.isNeedTurnDirection(tooltip):
+            if self.tabwidget.isNeedTurnDirection(tooltip):
                 rect = self.bar.tabRect(self.tabwidget.indexOf(win))
-                rect.translate(3, 8)
+                #rect.translate(3, 8)
+                rect.adjust(5,8,-5,-3)
                 painter.drawText(rect, Qt.TextWordWrap , tooltip)          
 
-class _crossDrag:
+class Bar_crossDrag(QObject):
     """实现自定义的垮tabwidget的拖动。其还需要tabwidget中的_crossDrag的配合"""
     def __init__(self, bar):
+        super(Bar_crossDrag,self).__init__(bar)
         self.bar = bar
         self.tabwidget = bar.tabwidget
-    def install(self):
         self.bar.setAcceptDrops(True)
         self.line = None
-        add_sub_obj(self.bar, self)
-        
-    def dragMoveEvent(self, event):
-        tabIdx = self.bar.tabAt( event.pos())
-        self.drawLine(tabIdx)
-        
+        #add_sub_obj(self.bar, self)
+    
+    def clear_line(self):
+        self.line=None
+         
     def drawLine(self, tabIdx):
         if tabIdx == -1:
             tabIdx = self.bar.count() - 1
@@ -273,11 +293,18 @@ class _crossDrag:
             else:   
                 self.line = ( rect.topLeft(), rect.topRight() )
         self.bar.update()
+        
+    def dragMoveEvent(self, event):
+        tabIdx = self.bar.tabAt( event.pos())
+        self.drawLine(tabIdx)  
+        
     def dragEnterEvent(self, event):
         event.acceptProposedAction()
+        
     def dragLeaveEvent(self, event):
         self.line = None
         self.bar.update()
+        
     def dropEvent(self, event):
         mime = event.mimeData()
         tabIdx = self.bar.tabAt( event.pos())
@@ -288,6 +315,7 @@ class _crossDrag:
         
         self.line = None
         self.bar.update()
+        
     def paintEvent(self, event):
         painter = QPainter(self.bar)
         # 画拖动时的线条
@@ -298,95 +326,56 @@ class _crossDrag:
             painter.setPen(pen)
             painter.drawLine(self.line[0], self.line[1])    
     def mousePressEvent(self, event):
-        self.bar.pressPos = event.pos()
+        self.pressPos = event.pos()
+        
     def mouseMoveEvent(self, event):
-        self = self.bar
+        #self = self.bar
         if not (event.buttons() & Qt.LeftButton):
             return
         if ((event.pos() - self.pressPos).manhattanLength() < QApplication.startDragDistance()):
             return      
 
-        itemIdx = self.tabAt(self.pressPos)
+        itemIdx = self.bar.tabAt(self.pressPos)
         if itemIdx == -1:
             return
         
-        drag = QDrag(self)
+        drag = QDrag(self.bar)
         mimeData = QMimeData()
         mimeData.win= self.tabwidget.widget(itemIdx)
         drag.setMimeData(mimeData)
    
         dropAction = drag.exec_(Qt.CopyAction | Qt.MoveAction) 
         
-class _crossDrag:
-    """与bar的_crossDrag组件一起构成了Tabwidget的拖拽功能"""
-    def __init__(self, tabwidget, bar_comdrag):
-        self.tabwidget = tabwidget
-        tabwidget.setAcceptDrops(True)
-        add_sub_obj(tabwidget, self)
-        self.bar_comdrag = bar_comdrag
-        
-    def dragEnterEvent(self, event):
-        event.acceptProposedAction()
-    def dropEvent(self, event):
-        mime = event.mimeData()
-        self.tabwidget.addTab(mime.win, mime.win.windowTitle() ) 
-        self.bar_comdrag.line = None
-        self.tabwidget.tabBar().update()   
-        
-    def dragMoveEvent(self, event):
-        self.bar_comdrag.drawLine( -1)
-    def dragLeaveEvent(self, event):
-        self.bar_comdrag.line = None
-        self.tabwidget.tabBar().update()     
+   
 
-from qt_.qtEven import *
-from qt_.widget.tabWidget_.barBase import BarBase
-from qt_.widget.tabWidget_.tabWidgetBase import TabWidgetBase
-import pickle, re
-class TabWidget(TabWidgetBase):
-    """
-    默认增加功能：
-    1 迭代窗口
-    2 保存，恢复所有能够pickle的窗口
-    
-    重要函数：
-    enableCrossDrag(Bar<-cls)           开启夸窗口拖拽功能
-    enableChineseDirection(Bar<-cls)    开启中文调整方向功能
-    
-    注意：这两个函数的参数是Bar的子类，不是Bar的对象
-    """
-    pass
-class Bar(BarBase):
-    """
-    用在TabWidget.enableCrossDrag的参数中
-    因为跨窗口拖动和调整中文方向，都需要更改QTableWidget.tabbar对象的行为，所以自定义了这个Bar，在enableXXX中会自动替换原tabbar。
-    可以被继承实现更多功能
-    """
-    pass
+
+
+
 if __name__ == "__main__":
     import sys
+    from PyQt4.QtGui import QApplication,QMainWindow,QTextEdit
     app = QApplication(sys.argv)
     man = QMainWindow()
-    win = TabWidget()
+    win = DockTab()
     #bar = Bar(win)
     #win.setTabBar(bar)
-    win.enableCrossDrag()
-    win.enableChineseDirection()
+    #win.enableCrossDrag()
+    #win.enableChineseDirection()
     #win.setMovable(True)
     man.setCentralWidget(win)
     man.show()    
-    win.addTab(QTextEdit(), "haha")
-    win.addTab(QTextEdit(), "中文")
-    win.addTab(QTextEdit(), "英文")
+    win.addTab(QTextEdit(), u"haha")
+    win.addTab(QTextEdit(), u"中文")
+    win.addTab(QTextEdit(), u"英文")
     win.setTabPosition(QTabWidget.West)
     win.setTabsClosable(True)
     
-    win2 = TabWidget()
+    win2 = DockTab()
     
     #bar2 = Bar(win2)
     #win2.setTabBar(bar2)
-    win2.enableCrossDrag()
-    win2.enableChineseDirection()
+    #win2.enableCrossDrag()
+    #win2.enableChineseDirection()
     win2.show()
     win2.setTabsClosable(True)
     #win2.addTab(QTextEdit(), "jjj")

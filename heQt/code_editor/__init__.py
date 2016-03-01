@@ -1,1 +1,1 @@
-from bridge import Bridge
+from bridge import CodeEditor
