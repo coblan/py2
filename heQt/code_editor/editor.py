@@ -83,7 +83,6 @@ class CodeEditor(QsciScintilla):
         rt = super(CodeEditor,self).keyPressEvent(QKeyEvent)
         if self._autoCompleter:
             self._autoCompleter.afterKey(QKeyEvent.key(),QKeyEvent.modifiers()) 
-        
         return rt
               
     def textRange(self,start, end):

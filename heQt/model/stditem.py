@@ -12,7 +12,7 @@ def save_item(item):
 
 def save_dsd(item):
     """
-    保存子孙为 list[]
+    保存子孙为 [{}]
     """
     if not item:
         return
@@ -37,12 +37,14 @@ def load_item(qbyte):
     return item
 
 def load_dsd(parent,childs):
+    """加载子孙item
+    """
     for child in childs:
         r=child.get('r')
         c=child.get('c')
         child_item=load_item(child.get('item'))
         parent.setChild(r,c,child_item)
-        load_dsd(child.get('dsd'), child)
+        load_dsd(child,child.get('dsd'))
     return parent
         
 
