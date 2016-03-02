@@ -1,27 +1,31 @@
 # -*= encoding:utf8 -*-
 from heQt.qteven import *
+from heStruct.cls import sub_obj_call,add_sub_obj
 from PyQt4.QtGui import QApplication,QStandardItemModel,QStandardItem,QColor
-from PyQt4.QtCore import QByteArray
+from PyQt4.QtCore import QByteArray,Qt
 from PyQt4.Qsci import QsciScintilla,QsciLexerHTML,QsciLexer
 import const
 
 from autocompleter import Autocompleter,AutoModel
-class Bridge(QsciScintilla):
+class CodeEditor(QsciScintilla):
     def __init__(self, parent=None):
-        super(Bridge,self).__init__(parent)
+        super(CodeEditor,self).__init__(parent)
         
-        lexer = QsciLexerHTML(self)
-        lexer.setColor(QColor('green'),style=QsciLexerHTML.Tag)
-        #self.setLexer(const.SCLEX_NULL)
-        self.setLexer(lexer)
+        #lexer = QsciLexerHTML(self)
+        #lexer.setColor(QColor('green'),style=QsciLexerHTML.Tag)
+        ##self.setLexer(const.SCLEX_NULL)
+        #self.setLexer(lexer)
         self.lexer= None #CusLexer(self)
         self._autoCompleter=None
         self.SCN_MODIFIED.connect(self.onModify)
+        self.setAttribute(Qt.WA_DeleteOnClose)
+        
     def setLexer(self,lexer):
         if isinstance(lexer,QsciLexer):
-            super(Bridge,self).setLexer(lexer)
+            super(CodeEditor,self).setLexer(lexer)
         else:
             self.lexer = lexer
+            add_sub_obj(self,self.lexer)
         
     def send(self,*args,**kw):
         return self.SendScintilla(*args,**kw)
@@ -38,27 +42,45 @@ class Bridge(QsciScintilla):
         
         if type_ & const.SC_MOD_BEFOREDELETE:
             # 删除前，暂时无用
-            pass
+            self.preDeleteEvent(pos, length)
             #self.contentChanged('beforeDel', pos, length)
         elif type_ & const.SC_MOD_BEFOREINSERT:
             # 插入前，暂时无用
-            pass
+            self.preInsertEvent(pos, length)
     
             #self.contentChanged('beforeInsert', pos, length)
             
         elif type_ & const.SC_MOD_INSERTTEXT:
-            if self.lexer:
-                self.lexer.insertEvent(pos, length)
+            self.insertEvent(pos, length)
+            #if self.lexer:
+                #self.lexer.insertEvent(pos, length)
 
         elif type_ & const.SC_MOD_DELETETEXT:
-            if self.lexer:
-                self.lexer.deleteEvent(pos,length)
+            self.deleteEvent(pos, length)
+            #if self.lexer:
+                #self.lexer.deleteEvent(pos,length)
             #self.contentChanged('delete', pos, length) 
-        
+    
+    @sub_obj_call
+    def preInsertEvent(self,pos,length):
+        pass
+    
+    @sub_obj_call
+    def insertEvent(self,pos,length):
+        pass
+    
+    @sub_obj_call
+    def preDeleteEvent(self,pos,length):
+        pass
+    
+    @sub_obj_call
+    def deleteEvent(self,pos,length):
+        pass
+    
     def keyPressEvent(self,QKeyEvent):
         if self._autoCompleter:
             self._autoCompleter.beforeKey(QKeyEvent.key(),QKeyEvent.modifiers())               
-        rt = super(Bridge,self).keyPressEvent(QKeyEvent)
+        rt = super(CodeEditor,self).keyPressEvent(QKeyEvent)
         if self._autoCompleter:
             self._autoCompleter.afterKey(QKeyEvent.key(),QKeyEvent.modifiers()) 
         
@@ -113,7 +135,7 @@ def test_adapte():
     automodel=AutoModel()
     automodel._primModel = model
     auto.setAutoModel(automodel)    
-def test_cuslexer():
+def test_cuslexer(window):
     from cusLexer import CusLexer,Hello
     window.setLexer(Hello(window))
     auto = Autocompleter(window)
@@ -126,8 +148,8 @@ def test_cuslexer():
 if __name__ =='__main__':
     import sys
     app = QApplication(sys.argv)
-    window = Bridge()
-    test_cuslexer()
+    window = CodeEditor()
+    test_cuslexer(window)
     #test_adapte()
     window.show()
     app.exec_()

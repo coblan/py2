@@ -58,7 +58,7 @@
 #print( p.name )
 #print(p2.name)
 
-<<<<<<< HEAD
+
 #print('\u00e5\u00ae\u00b9')
 
 #import memcache
@@ -97,7 +97,7 @@
 #print(gd.ls)
 ls = []
 print(ls.append('kk'))
-=======
+
 # <<<<<<< HEAD
 # # print('\u00e5\u00ae\u00b9')
 
@@ -129,4 +129,4 @@ func(**dc)
 print(dir(func))
 print(func.func_globals)
 help(func)
->>>>>>> t2int
+
