@@ -119,10 +119,11 @@ class DockTab(QTabWidget):
                 self.setCurrentWidget(currentWidget )
           
 
+    
     def saveWins(self):
         ls = []
         index = -1
-        for win in self:
+        for win in self.get_wins():
             index += 1
             try:
                 winbyt = pickle.dumps(win)
