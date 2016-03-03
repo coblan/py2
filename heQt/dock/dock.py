@@ -8,7 +8,7 @@ import pickle
 
 class Dock(QSplitter):
     """
-    Dock是DockPanel的容器，DockPanel是QWidget的容器，QWidget可以放置各种工具页面
+    Dock是DockPanel的容器，DockPanel是toolTab的容器，toolTab时QWidget子类，放置各种工具的页面
     Dock类，具有左中右三个位置，用于放置DockPannel面板。这些面板可以随意拖拽。
 例子:
     mainWin=QMainWindow()
@@ -27,8 +27,9 @@ class Dock(QSplitter):
     1.保存功能:
         如果要求DockPanel中的工具页面能够保存，下次启动时能够自动回复，就必须实现其pickle接口
     
-    2.工具页面tabbar上的邮件菜单
-       实现函数tabbarAction()，其返回QAction的列表
+    2.工具页面tabbar上的邮件菜单:
+       *. toolTab实现函数tabbarAction()，其返回QAction的列表
+       *. DockPanel.actions()
     
     """    
     def __init__(self, *args):

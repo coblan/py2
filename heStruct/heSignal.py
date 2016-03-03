@@ -1,12 +1,4 @@
 
-class HeSignal(object):
-    def __init__(self,name):
-        pass
-    
-    def regist():
-        pass
-    def fire(signal_name):
-        pass
 
 dc={}
 cnt=0

@@ -144,7 +144,7 @@ def load_expand(tree,model):
         for p,c in walk(model):
             cnt+=1
             if cnt in ls:
-                tree.expand(p.index())
+                tree.expand(c.index())
         
         
 def _load_item_child(p,childs):
@@ -176,9 +176,9 @@ def save_expand(tree,model):
     expaned=[]
     for p,c in walk(model):
         cnt+=1
-        if isinstance(p,QStandardItemModel):
-            continue
-        if tree.isExpanded(p.index()):
+        #if isinstance(p,QStandardItemModel):
+            #continue
+        if tree.isExpanded(c.index()):
             expaned.append(cnt)
     with open('expaned','w') as f:
         pickle.dump(expaned,f)

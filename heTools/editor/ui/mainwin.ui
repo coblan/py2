@@ -29,6 +29,7 @@
     </property>
     <addaction name="actionTest"/>
     <addaction name="actionAddDirTab"/>
+    <addaction name="actionNew_dir"/>
    </widget>
    <addaction name="menuFile"/>
   </widget>
@@ -41,6 +42,11 @@
   <action name="actionAddDirTab">
    <property name="text">
     <string>addDirTab</string>
+   </property>
+  </action>
+  <action name="actionNew_dir">
+   <property name="text">
+    <string>new_dir</string>
    </property>
   </action>
  </widget>
