@@ -7,8 +7,9 @@ from string import Template
 from PyQt4.QtGui import QTreeView, QStandardItemModel, QSplitter, QMessageBox, QApplication, QTextEdit, QStandardItem,\
      QAction,QMenu
 from PyQt4.QtCore import QObject, Qt, QSettings, QModelIndex
-from heQt.model.stdmodel import save_model,load_model
+from heQt.model.stdmodel import save_model,load_model,walk,childs
 import pickle
+import json
 
 class CmdWin(QSplitter):
     
@@ -21,13 +22,13 @@ class CmdWin(QSplitter):
         self.addWidget(self.tree)
         self.addWidget(self.info)
         #self.setContextMenuPolicy(Qt.ActionsContextMenu)
-        dc={"add":'add',
-            'run':'run',
-            'save':'save'
-            }
-        for k ,v in dc.items():
+        acs=['run',
+            "add",
+            'delete',
+            'save' ]
+        for k  in acs:
             ac=QAction(k,self)
-            ac.triggered.connect(getattr(self.auOb,v))
+            ac.triggered.connect(getattr(self.auOb,k))
             self.addAction(ac)  
         
         self.tree.index_changed.connect(self.on_tree_index_changed)
@@ -57,11 +58,19 @@ class CmdWin(QSplitter):
             self.restoreState(stns.value("win/split"))
         except TypeError:
             pass
+        
+        try:
+            load_cmd(self.tree.model())
+            load_expand(self.tree, self.tree.model())
+        except IOError as e:
+            print(e)        
 
     def closeEvent(self, evnt):
         stns = QSettings('stns', QSettings.IniFormat)
         stns.setValue('win/geo', self.saveGeometry())
         stns.setValue("win/split", self.saveState())
+        save_cmd(self.tree.model())
+        save_expand(self.tree,self.tree.model())
         super(CmdWin, self).closeEvent(evnt)
         
 
@@ -87,11 +96,11 @@ class Logic(QObject):
         self.cursor_pos=None
     
     def under_mouse_index(self):
-        pass
+        return self.tree.indexAt(self.cursor_pos)
     
     def add(self):
         #idx = self.tree.ctxMenuIdx
-        idx=self.tree.indexAt(self.cursor_pos)
+        idx= self.under_mouse_index()
         model=self.tree.model()
         if idx.isValid():
             item=self.tree.model().itemFromIndex(idx)
@@ -100,10 +109,10 @@ class Logic(QObject):
             self.tree.model().appendRow(QStandardItem('new item'))
 
     def delete(self):
-        idx = self.tree.ctxMenuIdx
+        idx = self.under_mouse_index()
         if idx.isValid():
             if QMessageBox.information(None, 'warn', 'realy delete?%s' % idx.data()) == QMessageBox.Ok:
-                self.tree.model().remove(idx)
+                self.tree.model().removeRow(idx.row(),idx.parent() )
 
     def run(self):
         scope = {}
@@ -125,24 +134,60 @@ class Logic(QObject):
 
 def load_cmd(model):
     with open('cmd') as f:
-        dc=pickle.load(f)
-        load_model(model, dc)
+        items=json.load(f)
+        _load_item_child(model,items)
 
+def load_expand(tree,model):
+    with open('expaned') as f:
+        ls=pickle.load(f)
+        cnt=0
+        for p,c in walk(model):
+            cnt+=1
+            if cnt in ls:
+                tree.expand(p.index())
+        
+        
+def _load_item_child(p,childs):
+    for child in childs:
+        child_item=QStandardItem(child['name'])
+        child_item.setData(child['data'],Qt.UserRole+1)
+        _load_item_child(child_item,child['childs'])
+        p.appendRow(child_item)
+
+
+        
 def save_cmd(model):
-    seri=save_model(model)
+    s=_save_item_child(model)
     with open('cmd','w') as f:
-        pickle.dump(seri,f)
+        json.dump(s,f)  
+        
 
+def _save_item_child(item):
+    out=[]
+    for child in childs(item):
+        dc={'name':child.data(Qt.DisplayRole),
+            'childs':_save_item_child(child),
+            'data':child.data(Qt.UserRole + 1)}
+        out.append(dc)
+    return out
 
-
+def save_expand(tree,model):
+    cnt=0
+    expaned=[]
+    for p,c in walk(model):
+        cnt+=1
+        if isinstance(p,QStandardItemModel):
+            continue
+        if tree.isExpanded(p.index()):
+            expaned.append(cnt)
+    with open('expaned','w') as f:
+        pickle.dump(expaned,f)
+        
 if __name__ == '__main__':
     os.chdir('cmdgui')
     app = QApplication(sys.argv)
     mainWin = CmdWin()
-    try:
-        load_cmd(mainWin.tree.model())
-    except IOError as e:
-        print(e)
+
 
     # lay=QSplitter()
 
