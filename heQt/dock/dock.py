@@ -181,11 +181,18 @@ class DockPanel(DockTab):
         self.setAcceptDrops(True)
         self.setContextMenuPolicy(Qt.ActionsContextMenu)
         
+        act_rm_tab=QAction(u'移除当前标签页',self)
         act = QAction(u"移除本面板", self)
+        
+        self.addAction(act_rm_tab)
         self.addAction(act)
         
+        act_rm_tab.triggered.connect(self.remove_current_tab)
         act.triggered.connect(self.uninstall)
-        
+    
+    def remove_current_tab(self):
+        self.removeTab(self.currentIndex())
+    
     def uninstall(self):
         ls = []
         for win in self.get_wins():
@@ -256,7 +263,11 @@ class customBar(BarBase):
             menu.addActions(win.tabbarAction())
         menu.addActions(self.tabwidget.actions())
         menu.exec_(pos)
-
+    
+    # def current_tab(self):
+        # # return self.tabwidget.widget( self.tabAt(event.pos () ) )
+        # return self.tabwidget.currentWidget()
+    
     def switchPanel(self):
         wid = self.mainSplit.sizes()
         index = self.mainSplit.indexOf(self.outSplit)

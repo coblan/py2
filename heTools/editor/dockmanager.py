@@ -4,6 +4,7 @@ from heQt.dock import DockPanel
 #from dir_tool_tab import DirToolTab
 from heQt.dock.toolTabs.fastDir import FastDirTab
 from heStruct.heSignal import fire
+import os
 if 0:
     from main import MainWin,Dock
     
@@ -21,7 +22,7 @@ class DockManager(QObject):
         self.mainwin.actionNew_dir.triggered.connect(self.newdir)
     
     def newdir(self):
-        fire("new_dir",r'D:\try\test\rrr\templates')
+        fire("new_dir",os.getcwd())
         
     def addDirTab(self):
         self.panel1=DockPanel()
