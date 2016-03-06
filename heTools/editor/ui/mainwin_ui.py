@@ -44,9 +44,12 @@ class Ui_MainWindow(object):
         self.actionAddDirTab.setObjectName(_fromUtf8("actionAddDirTab"))
         self.actionNew_dir = QtGui.QAction(MainWindow)
         self.actionNew_dir.setObjectName(_fromUtf8("actionNew_dir"))
+        self.actionOpen_outline = QtGui.QAction(MainWindow)
+        self.actionOpen_outline.setObjectName(_fromUtf8("actionOpen_outline"))
         self.menuFile.addAction(self.actionTest)
         self.menuFile.addAction(self.actionAddDirTab)
         self.menuFile.addAction(self.actionNew_dir)
+        self.menuFile.addAction(self.actionOpen_outline)
         self.menubar.addAction(self.menuFile.menuAction())
 
         self.retranslateUi(MainWindow)
@@ -58,4 +61,5 @@ class Ui_MainWindow(object):
         self.actionTest.setText(_translate("MainWindow", "here", None))
         self.actionAddDirTab.setText(_translate("MainWindow", "addDirTab", None))
         self.actionNew_dir.setText(_translate("MainWindow", "new_dir", None))
+        self.actionOpen_outline.setText(_translate("MainWindow", "open_outline", None))
 

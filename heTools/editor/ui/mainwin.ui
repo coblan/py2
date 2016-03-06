@@ -30,6 +30,7 @@
     <addaction name="actionTest"/>
     <addaction name="actionAddDirTab"/>
     <addaction name="actionNew_dir"/>
+    <addaction name="actionOpen_outline"/>
    </widget>
    <addaction name="menuFile"/>
   </widget>
@@ -47,6 +48,11 @@
   <action name="actionNew_dir">
    <property name="text">
     <string>new_dir</string>
+   </property>
+  </action>
+  <action name="actionOpen_outline">
+   <property name="text">
+    <string>open_outline</string>
    </property>
   </action>
  </widget>

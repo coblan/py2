@@ -3,6 +3,7 @@ from PyQt4.QtCore import QObject
 from heQt.dock import DockPanel
 #from dir_tool_tab import DirToolTab
 from heQt.dock.toolTabs.fastDir import FastDirTab
+from heQt.dock.toolTabs.outline import Outline
 from heStruct.heSignal import fire
 import os
 if 0:
@@ -20,9 +21,13 @@ class DockManager(QObject):
         
         self.mainwin.actionAddDirTab.triggered.connect(self.addDirTab)
         self.mainwin.actionNew_dir.triggered.connect(self.newdir)
+        self.mainwin.actionOpen_outline.triggered.connect(self.open_outline)
     
     def newdir(self):
         fire("new_dir",os.getcwd())
+    def open_outline(self):
+        outline=Outline()
+        self.dock.add_tab(outline,u'大纲')
         
     def addDirTab(self):
         self.panel1=DockPanel()

@@ -1,18 +1,18 @@
 # -*- encoding:utf8 -*-
 from PyQt4.QtCore import QObject
-from PyQt4.QtGui import QColor
+from PyQt4.QtGui import QColor,QFont
 import re
 import sys
 from PyQt4.Qsci import QsciStyle
 import const
 if 0:
-    from bridge import CodeEditor
+    from heQt.code_editor import CodeEditor
     
-def QcolorToRGB(color):
-    r = color.red()
-    g = color.green()
-    b = color.blue()
-    return (r | g << 8 | b << 16)
+#def QcolorToRGB(color):
+    #r = color.red()
+    #g = color.green()
+    #b = color.blue()
+    #return (r | g << 8 | b << 16)
 
 class CusLexer(QObject):
     """Lexer基类，构造函数直接 将lexer插在editor上
@@ -76,10 +76,19 @@ class CusLexer(QObject):
         self.setFormat(end, end + 1, number)
     
     def setForeColor(self,n,color):
-        #color = QcolorToRGB(QColor)
         self.editor.send(const.SCI_STYLESETFORE, n, color)
+    
+    def setStyleFont(self, n, font):
+        assert isinstance(font, QFont)
+        self.send(const.SCI_STYLESETBOLD, n, 1 if font.bold() else 0)
+        self.send(const.SCI_STYLESETITALIC, n, 1 if font.italic() else 0)
+        self.send(const.SCI_STYLESETWEIGHT, n, font.weight())
+        self.send(const.SCI_STYLESETSIZE, n, font.pointSize())
+        self.send(const.SCI_STYLESETFONT, n, font.family().encode("utf8"))   
+        
     def send(self,*args,**kw):
-        return self.editor.SendScintilla(*args,**kw)
+        return self.editor.send(*args,**kw)
+        
     def setFormat(self, start, end, n):
         self.send(const.SCI_STARTSTYLING, start)
         self.send(const.SCI_SETSTYLING, end - start, n)         

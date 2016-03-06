@@ -163,7 +163,9 @@ class TabWidget_crossDrag(QObject):
         add_sub_obj(tabwidget, self)
 
     def dragEnterEvent(self, event):
-        event.acceptProposedAction()
+        mime = event.mimeData()
+        if hasattr(mime,'win'):
+            event.acceptProposedAction()
         
     def dropEvent(self, event):
         mime = event.mimeData()

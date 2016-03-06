@@ -69,7 +69,19 @@ class Dock(QSplitter):
         #if self.
         #self.setStretchFactor(0, 0)
         #self.setStretchFactor(1, 1)
-        #self.setStretchFactor(2, 0)           
+        #self.setStretchFactor(2, 0)   
+    
+    def get_one_panel(self):
+        panel=self.findChild(DockPanel)
+        if  panel is None:
+            panel=DockPanel()
+            self.addLeft(panel)
+        return panel
+    
+    def add_tab(self,win,name):
+        panel=self.get_one_panel()
+        panel.addTab(win,name)
+        
     def addLeft(self, tabWin):
         if not self.left.added:
             self.insertWidget(0, self.left)
@@ -231,6 +243,7 @@ class DockPanel(DockTab):
             try:
                 wins.append(pickle.dumps(win))
             except Exception as e:
+                print(u'Pickel DockPanel时产生异常,win_title=%s'%win.windowTitle() )
                 print(e)
                 
         self.pickleDict = {"wins": wins, 
@@ -330,6 +343,7 @@ class Lab(QLabel):
         return [QAction('jjjj',self),QAction('ffff',self)]
         
 def test():
+    #win.get_one_panel()
     tt, ok = QInputDialog.getText(None, "s", "f")
     if not ok:
         return
@@ -344,6 +358,8 @@ def test():
     win2.restore(win.save())
     win2.show()
     win.brother=win2
+    
+    
     # ss=pickle.dumps(win)
     # tab2=pickle.loads(ss)
     # tab2.show()

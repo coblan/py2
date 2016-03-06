@@ -19,9 +19,7 @@ class Autocompleter(QListView):
         2. setShowLines(10) ,提示框显示多少行
         
         """
-        super(Autocompleter,self).__init__(editor)
-        if 0:
-            assert isinstance(editor, Bridge)    
+        super(Autocompleter,self).__init__(editor) 
         self.editor = editor
         self._autoModel = None
         self._compKeys=[Qt.Key_Return,]

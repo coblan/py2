@@ -1,13 +1,14 @@
 # -*- encoding:utf8 -*-
 from heQt.qteven import *
 import sys
-from PyQt4.QtGui import QApplication,QMainWindow,QTabWidget,QWidget
+from PyQt4.QtGui import QApplication,QMainWindow,QWidget
 from heQt.code_editor import CodeEditor
 from heQt.dock import Dock,DockPanel
 from ui.mainwin_ui import Ui_MainWindow
 import pickle
 
 from dockmanager import DockManager
+from editormanager import EditorManager
 
 class MainWin(QMainWindow,Ui_MainWindow):
     def __init__(self,p=None):
@@ -15,7 +16,7 @@ class MainWin(QMainWindow,Ui_MainWindow):
         self.setupUi(self)
         
         self.dock=Dock()
-        self.tabwin=QTabWidget()
+        self.tabwin=EditorManager()
         self.setCentralWidget(self.dock)
         self.dock.setCentralWidget(self.tabwin)
         self.dockmanager=DockManager(self.dock,self)
@@ -50,10 +51,9 @@ class MainWin(QMainWindow,Ui_MainWindow):
 if __name__=='__main__':
     app=QApplication(sys.argv)
     win=MainWin()
-    win.show()
     try:
         win.load_settings()
     except IOError as e:
         print(e)
-    
+    win.show()
     sys.exit(app.exec_())
