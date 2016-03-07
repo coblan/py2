@@ -10,8 +10,8 @@ from heStruct.heSignal import connect
 class LexerPython(CusLexer):
     def __init__(self, editor,model):
         super(LexerPython,self).__init__(editor)
-        self.model=model
-        self.model.setSortRole(Qt.UserRole+1)
+        self.outline=OutlineProc(editor,model)
+        
         self.setForeColor(18,QColor('blue'))
         self.setForeColor(1,QColor('green'))
         font=QFont()
@@ -19,8 +19,26 @@ class LexerPython(CusLexer):
         font.setItalic(True)
         self.setStyleFont(18,font)
         self.setForeColor(32,QColor('black'))
-        self.grab_lines=[]
+           
+    def hightText(self, start, end):
+        self.setFormat(start, end, 32)
+        text = self.editor.textRange(start, end)
+        for i in re.finditer('class|def', text):
+            self.setFormat( start+i.start(),start+i.end(),18)  
+        for i in re.finditer('#.*?$',text,re.MULTILINE):
+            self.setFormat( start+i.start(),start+i.end(),1)  
+        #self._update_outline(start, text)
+        self.outline.update_outline_model(start, text)
         
+
+                
+class OutlineProc(object):
+    def __init__(self,editor,model):
+        self.editor=editor
+        self.model=model
+        self.model.setSortRole(Qt.UserRole+1)        
+        self.grab_lines=[]
+    
         connect('outline_click_item',self.on_outline_click_item)
     def on_outline_click_item(self,model,item):
         if model!=self.model:
@@ -30,18 +48,9 @@ class LexerPython(CusLexer):
             pos=self.editor.posFromLine(item.data(Qt.UserRole+1))
             pos+= len( item.data(Qt.DisplayRole).encode('utf8') ) 
             self.editor.gotoPos(pos)
-            self.editor.setFocus(True)
-            
-    def hightText(self, start, end):
-        self.setFormat(start, end, 32)
-        text = self.editor.textRange(start, end)
-        for i in re.finditer('class|def', text):
-            self.setFormat( start+i.start(),start+i.end(),18)  
-        for i in re.finditer('#.*?$',text,re.MULTILINE):
-            self.setFormat( start+i.start(),start+i.end(),1)  
-        self._update_outline(start, text)
-        
-    def _update_outline(self,start,text):
+            self.editor.setFocus(True)        
+    
+    def update_outline_model(self,start,text):
         for i in re.finditer('^#!(.*?)$',text,re.MULTILINE):
             pos=start+i.start()
             line_num=self.editor.lineFromPos(pos)
@@ -61,6 +70,5 @@ class LexerPython(CusLexer):
                 self.model.sort(0)
             else:
                 index=[gb.line for gb in self.grab_lines].index(line_num)
-                self.grab_lines[index].item.setData(i.group(1).decode('utf8'),Qt.DisplayRole)     # [2]
-    
+                self.grab_lines[index].item.setData(i.group(1).decode('utf8'),Qt.DisplayRole)     # [2]        
     

@@ -127,10 +127,6 @@ class Dock(QSplitter):
         return pickle.dumps(state)
     
     def restore(self, state):
-        # if not QByt:
-            # return
-        # if isinstance(QByt, QByteArray):
-            # QByt = QByt.data()
         state = pickle.loads(state)
         self._restoreSplit(state, self.addLeft, "left")
         self._restoreSplit(state, self.addRight, "right")

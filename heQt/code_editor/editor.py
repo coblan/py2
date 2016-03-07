@@ -9,6 +9,8 @@ from grabLine import GrabLineManager
 
 from autocompleter import Autocompleter,AutoModel
 class CodeEditor(QsciScintilla):
+    SAVEPOINTLEFT=pyqtSignal()
+    SAVEPOINTREACHED=pyqtSignal()
     def __init__(self, parent=None):
         super(CodeEditor,self).__init__(parent)
         
@@ -29,7 +31,18 @@ class CodeEditor(QsciScintilla):
         add_sub_obj(self,self.grabline_manager)
         
         self.SCN_MODIFIED.connect(self.onModify)
+        self.SCN_SAVEPOINTLEFT.connect(self.SAVEPOINTLEFT)
+        self.SCN_SAVEPOINTREACHED.connect(self.SAVEPOINTREACHED)
         self.setAttribute(Qt.WA_DeleteOnClose)
+    
+    def emptyUndoBuff(self):
+        self.send(const.SCI_EMPTYUNDOBUFFER)
+    
+    def isModified(self):
+        return False if self.send(const.SCI_GETMODIFY)==0 else True
+    
+    def setSavePoint(self):
+        self.send(const.SCI_SETSAVEPOINT)
     
     def grabLine(self,line_num):
         """
@@ -128,6 +141,12 @@ class CodeEditor(QsciScintilla):
         byt = bytearray(end-start)
         self.send(const.SCI_GETTEXTRANGE,start,end,byt)
         return str(byt)
+    def text(self):
+        length=self.send(const.SCI_GETLENGTH)
+        byt = bytearray(length+1)
+        self.send(const.SCI_GETTEXT,length+1,byt)
+        return str(byt)
+    
     def currentPos(self):
         return self.send(const.SCI_GETCURRENTPOS)   
     

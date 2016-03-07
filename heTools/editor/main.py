@@ -1,12 +1,12 @@
 # -*- encoding:utf8 -*-
 from heQt.qteven import *
 import sys
-from PyQt4.QtGui import QApplication,QMainWindow,QWidget
+from PyQt4.QtGui import QApplication,QMainWindow,QWidget,QStatusBar,QLabel
 from heQt.code_editor import CodeEditor
 from heQt.dock import Dock,DockPanel
 from ui.mainwin_ui import Ui_MainWindow
 import pickle
-
+from heStruct.heSignal import connect
 from dockmanager import DockManager
 from editormanager import EditorManager
 
@@ -16,30 +16,41 @@ class MainWin(QMainWindow,Ui_MainWindow):
         self.setupUi(self)
         
         self.dock=Dock()
-        self.tabwin=EditorManager()
+        self.editors=EditorManager()
         self.setCentralWidget(self.dock)
-        self.dock.setCentralWidget(self.tabwin)
+        self.dock.setCentralWidget(self.editors)
         self.dockmanager=DockManager(self.dock,self)
-        
+        #status_bar=QStatusBar()
+        #self.setStatusBar(status_bar)
+        self.encode_labe=QLabel()
+        self.encode_labe.setStyleSheet('margin-right: 20px;')
+        self.statusBar().addPermanentWidget(self.encode_labe)
         self.actionTest.triggered.connect(self.test)
-
+        connect('code_encoding',self.show_encoding)
+        self.actionSave.triggered.connect(self.editors.save_current_content)
+    def show_encoding(self,encode):
+        self.encode_labe.setText(encode)
+        
     def test(self):
         self.panel1=DockPanel()
         self.dock.addLeft(self.panel1)
         self.panel1.addTab(QWidget(),u'浮冰')
-        self.tabwin.addTab(CodeEditor(),'ri')
+        self.editors.addTab(CodeEditor(),'ri')
     
     def load_settings(self):
         with open('auto/state') as f:
             dc=pickle.load(f)
             self.restoreGeometry(dc['geo'])
             self.dock.restore(dc['dock'])
+            self.editors.restore(dc.get('editors'))
     
     def save_state(self):
         geo=self.saveGeometry()
         dock=self.dock.save()
+        editors=self.editors.save()
         dc={'geo':geo,
-            'dock':dock
+            'dock':dock,
+            'editors':editors
         }
         with open('auto/state','w') as f:
             pickle.dump(dc,f)
