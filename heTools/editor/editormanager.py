@@ -14,7 +14,7 @@ class EditorManager(QTabWidget):
         super(EditorManager,self).__init__(parent)
         self.setTabsClosable(True)
         self.tabCloseRequested.connect(self.removeTab)
-        connect('open_file',self.open_file)
+        connect('fastDir_doubleClicked',self.open_file)
         self.currentChanged.connect(self.on_switch_win)
     
     def undo(self):
