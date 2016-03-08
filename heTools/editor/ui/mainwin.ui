@@ -49,6 +49,8 @@
    </attribute>
    <addaction name="actionSave"/>
    <addaction name="actionSave_all"/>
+   <addaction name="actionUndo"/>
+   <addaction name="actionRedo"/>
   </widget>
   <action name="actionTest">
    <property name="text">
@@ -80,7 +82,27 @@
     <string>save_all</string>
    </property>
   </action>
+  <action name="actionUndo">
+   <property name="icon">
+    <iconset resource="mainwin.qrc">
+     <normaloff>:/image/image/undo_64px_1188189_easyicon.net.ico</normaloff>:/image/image/undo_64px_1188189_easyicon.net.ico</iconset>
+   </property>
+   <property name="text">
+    <string>undo</string>
+   </property>
+  </action>
+  <action name="actionRedo">
+   <property name="icon">
+    <iconset resource="mainwin.qrc">
+     <normaloff>:/image/image/redo_64px_1188145_easyicon.net.ico</normaloff>:/image/image/redo_64px_1188145_easyicon.net.ico</iconset>
+   </property>
+   <property name="text">
+    <string>redo</string>
+   </property>
+  </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="mainwin.qrc"/>
+ </resources>
  <connections/>
 </ui>

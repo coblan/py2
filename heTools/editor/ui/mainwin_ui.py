@@ -53,6 +53,16 @@ class Ui_MainWindow(object):
         self.actionSave.setObjectName(_fromUtf8("actionSave"))
         self.actionSave_all = QtGui.QAction(MainWindow)
         self.actionSave_all.setObjectName(_fromUtf8("actionSave_all"))
+        self.actionUndo = QtGui.QAction(MainWindow)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(_fromUtf8(":/image/image/undo_64px_1188189_easyicon.net.ico")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionUndo.setIcon(icon)
+        self.actionUndo.setObjectName(_fromUtf8("actionUndo"))
+        self.actionRedo = QtGui.QAction(MainWindow)
+        icon1 = QtGui.QIcon()
+        icon1.addPixmap(QtGui.QPixmap(_fromUtf8(":/image/image/redo_64px_1188145_easyicon.net.ico")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionRedo.setIcon(icon1)
+        self.actionRedo.setObjectName(_fromUtf8("actionRedo"))
         self.menuFile.addAction(self.actionTest)
         self.menuFile.addAction(self.actionAddDirTab)
         self.menuFile.addAction(self.actionNew_dir)
@@ -62,6 +72,8 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menuFile.menuAction())
         self.toolBar.addAction(self.actionSave)
         self.toolBar.addAction(self.actionSave_all)
+        self.toolBar.addAction(self.actionUndo)
+        self.toolBar.addAction(self.actionRedo)
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -76,4 +88,7 @@ class Ui_MainWindow(object):
         self.actionOpen_outline.setText(_translate("MainWindow", "open_outline", None))
         self.actionSave.setText(_translate("MainWindow", "save", None))
         self.actionSave_all.setText(_translate("MainWindow", "save_all", None))
+        self.actionUndo.setText(_translate("MainWindow", "undo", None))
+        self.actionRedo.setText(_translate("MainWindow", "redo", None))
 
+import mainwin_rc

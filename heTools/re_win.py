@@ -1,5 +1,5 @@
 # -*- encoding:utf8 -*-
-
+from heQt.qteven import *
 import sys
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *

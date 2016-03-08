@@ -26,8 +26,17 @@ class MainWin(QMainWindow,Ui_MainWindow):
         self.encode_labe.setStyleSheet('margin-right: 20px;')
         self.statusBar().addPermanentWidget(self.encode_labe)
         self.actionTest.triggered.connect(self.test)
-        connect('code_encoding',self.show_encoding)
+        # connect('code_encoding',self.show_encoding)
         self.actionSave.triggered.connect(self.editors.save_current_content)
+        self.actionUndo.triggered.connect(self.editors.undo)
+        self.actionRedo.triggered.connect(self.editors.redo)
+        self.editors.undoStateChanged.connect(self.set_undo_state)
+        self.editors.currentEncodeChanged.connect(self.show_encoding)
+        
+    def set_undo_state(self,undo,redo):
+        self.actionUndo.setEnabled(undo)
+        self.actionRedo.setEnabled(redo)
+        
     def show_encoding(self,encode):
         self.encode_labe.setText(encode)
         

@@ -11,13 +11,14 @@ from autocompleter import Autocompleter,AutoModel
 class CodeEditor(QsciScintilla):
     SAVEPOINTLEFT=pyqtSignal()
     SAVEPOINTREACHED=pyqtSignal()
+    undoStateChanged=pyqtSignal(bool,bool)
     def __init__(self, parent=None):
         super(CodeEditor,self).__init__(parent)
         
         self.send(const.SCI_SETCODEPAGE, const.SC_CP_UTF8)
         
         self.setCaretLineVisible(True)
-        self.setCaretLineBackgroundColor(QColor("#CDA869"))
+        self.setCaretLineBackgroundColor(QColor(200,200,0,30))
         #lexer = QsciLexerHTML(self)
         #lexer.setColor(QColor('green'),style=QsciLexerHTML.Tag)
         ##self.setLexer(const.SCLEX_NULL)
@@ -40,6 +41,23 @@ class CodeEditor(QsciScintilla):
     
     def isModified(self):
         return False if self.send(const.SCI_GETMODIFY)==0 else True
+    
+    def canUndo(self):
+        return True if self.send(const.SCI_CANUNDO) else False
+    
+    def undo(self):
+        self.send(const.SCI_UNDO)
+        self._emit_undo_state()
+    
+    def redo(self):
+        self.send(const.SCI_REDO)
+        self._emit_undo_state()
+        
+    def _emit_undo_state(self):
+        self.undoStateChanged.emit(self.canUndo(),self.canRedo())
+        
+    def canRedo(self):
+        return True if self.send(const.SCI_CANREDO) else False
     
     def setSavePoint(self):
         self.send(const.SCI_SETSAVEPOINT)
@@ -131,10 +149,15 @@ class CodeEditor(QsciScintilla):
     
     def keyPressEvent(self,QKeyEvent):
         if self._autoCompleter:
-            self._autoCompleter.beforeKey(QKeyEvent.key(),QKeyEvent.modifiers())               
+            self._autoCompleter.beforeKey(QKeyEvent.key(),QKeyEvent.modifiers())   
+        # if QKeyEvent.modifiers()==Qt.ControlModifier and QKeyEvent.key()==Qt.Key_Z:
+            # rt=None
+            # self.undo()
+        # else:
         rt = super(CodeEditor,self).keyPressEvent(QKeyEvent)
         if self._autoCompleter:
             self._autoCompleter.afterKey(QKeyEvent.key(),QKeyEvent.modifiers()) 
+        self._emit_undo_state()
         return rt
               
     def textRange(self,start, end):

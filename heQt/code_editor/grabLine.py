@@ -23,7 +23,7 @@ class GrabLineManager(object):
         elif lineAdd < 0:
             ls = []
             for itm in self.grabedLines:
-                tem_line=itm.lineNum()
+                item_line=itm.lineNum()
                 if line < item_line <= line + abs(lineAdd):
                     ls.append(itm)
                 #elif line < num:
