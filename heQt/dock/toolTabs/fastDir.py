@@ -34,6 +34,8 @@ class FastDirTab(QTreeView):
         index=self.currentIndex()
         if index.isValid():
             path=index.data(self.PATH_DATA)
+            if QMessageBox.warning(None,u'警告',u'是否要删除 %s'%path,QMessageBox.Yes|QMessageBox.No)==QMessageBox.No:
+                return
             if recycle_path(path)==0:    
                 self.model().removeRow(index.row(),index.parent())
             
