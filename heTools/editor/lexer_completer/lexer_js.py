@@ -7,9 +7,6 @@ from PyQt4.QtCore import Qt
 import re
 from heStruct.heSignal import connect
 
-#if 0:
-    #from heQt.code_editor import CodeEditor
-
 class LexerJs(CusLexer):
     def __init__(self, editor,model):
         super(LexerJs,self).__init__(editor)
@@ -35,7 +32,6 @@ class LexerJs(CusLexer):
             self.setFormat( start+i.start(),start+i.end(),18)  
         for i in re.finditer('//.*?$',text,re.MULTILINE):
             self.setFormat( start+i.start(),start+i.end(),1)  
-        #self._update_outline(start, text)
         self.outline.update_outline_model(start, text)
         
 
