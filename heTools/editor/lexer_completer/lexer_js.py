@@ -1,29 +1,37 @@
 # -*- encoding:utf8 -*-
 
+import sys
 from heQt.code_editor import CusLexer
 from PyQt4.QtGui import QColor,QFont,QStandardItemModel,QStandardItem
 from PyQt4.QtCore import Qt
 import re
 from heStruct.heSignal import connect
+
 #if 0:
     #from heQt.code_editor import CodeEditor
+
 class LexerJs(CusLexer):
     def __init__(self, editor,model):
         super(LexerJs,self).__init__(editor)
         self.outline=OutlineProc(editor,model)
-        
         self.setForeColor(18,QColor('blue'))
         self.setForeColor(1,QColor('green'))
-        font=QFont()
+
+        font2=QFont()
+        font2.setFamily('Courier New')
+        font2.setPointSize(10)
+        self.setStyleFont(32,font2)
+        self.setForeColor(32,QColor('black'))
+        
+        font=QFont(font2)
         font.setBold(True)
         font.setItalic(True)
-        self.setStyleFont(18,font)
-        self.setForeColor(32,QColor('black'))
-           
+        self.setStyleFont(18,font)        
+        
     def hightText(self, start, end):
         self.setFormat(start, end, 32)
         text = self.editor.textRange(start, end)
-        for i in re.finditer('function', text):
+        for i in re.finditer('function|\$', text):
             self.setFormat( start+i.start(),start+i.end(),18)  
         for i in re.finditer('//.*?$',text,re.MULTILINE):
             self.setFormat( start+i.start(),start+i.end(),1)  
