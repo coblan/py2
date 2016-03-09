@@ -5,6 +5,8 @@ from PyQt4.QtCore import QDir,QFileInfo,Qt,QModelIndex
 from os.path import join
 from heStruct.heSignal import reciver,connect,fire
 from heQt.model.stdmodel import childs,walk
+from heOs.heio import open_with_os
+from heOs.windows.fileope import recycle_path
 
 class FastDirTab(QTreeView):
     def __init__(self, parent=None):
@@ -15,13 +17,36 @@ class FastDirTab(QTreeView):
         self.setAcceptDrops(True)
         self.setDragDropMode(QAbstractItemView.InternalMove)
         self.setContextMenuPolicy(Qt.DefaultContextMenu)
-        connect('new_dir', self.add_path)
+        
+        act_open_with_os=QAction(u'使用系统打开',self)
+        act_recycle=QAction(u'删除到回收站',self)
+        
+        self.addAction(act_open_with_os)
+        self.addAction(act_recycle)
+        
         self.setEditTriggers(QTreeView.NoEditTriggers)
         self.expanded.connect(self.expand_index)
         self.doubleClicked.connect(self.on_db_clicked)
-        
+        act_open_with_os.triggered.connect(self.open_with_os)
+        act_recycle.triggered.connect(self.recycle)
+    
+    def recycle(self):
+        index=self.currentIndex()
+        if index.isValid():
+            path=index.data(self.PATH_DATA)
+            if QMessageBox.warning(None,u'警告',u'是否要删除 %s'%path,QMessageBox.Yes|QMessageBox.No)==QMessageBox.No:
+                return
+            if recycle_path(path)==0:    
+                self.model().removeRow(index.row(),index.parent())
+            
+    def open_with_os(self):
+        index=self.currentIndex()
+        if index.isValid():
+            path=index.data(self.PATH_DATA)
+            open_with_os(path)
+    
     def on_db_clicked(self,index):    
-        fire('open_file',index.data(self.PATH_DATA) )
+        fire('fastDir_doubleClicked',index.data(self.PATH_DATA) )
     
     def get_context_actions(self,dc):
         if not hasattr(self,'_actions'):
@@ -63,6 +88,7 @@ class FastDirTab(QTreeView):
             dc['under_cursor_is_root_dir']=True
         actions=self.get_context_actions(dc)
         menu=QMenu()
+        menu.addActions(self.actions())
         menu.addActions(actions)
         menu.exec_(globle_pos)        
     
