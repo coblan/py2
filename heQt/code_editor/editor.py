@@ -25,7 +25,7 @@ class CodeEditor(QsciScintilla):
         #self.setLexer(lexer)
         self.setMarginTypeN(0,const.SC_MARGIN_NUMBER)
         self.setMarginWidthN(0,40)
-        
+        self.setTabWidth(4)
         self.lexer= None #CusLexer(self)
         self._autoCompleter=None
         self.grabline_manager=GrabLineManager(self)
