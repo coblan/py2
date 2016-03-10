@@ -14,11 +14,17 @@ class LexerPython(CusLexer):
         
         self.setForeColor(18,QColor('blue'))
         self.setForeColor(1,QColor('green'))
-        font=QFont()
+
+        font2=QFont()
+        font2.setFamily('Courier New')
+        font2.setPointSize(10)
+        self.setStyleFont(32,font2)        
+        self.setForeColor(32,QColor('black'))
+        
+        font=QFont(font2)
         font.setBold(True)
         font.setItalic(True)
-        self.setStyleFont(18,font)
-        self.setForeColor(32,QColor('black'))
+        self.setStyleFont(18,font)        
            
     def hightText(self, start, end):
         self.setFormat(start, end, 32)
