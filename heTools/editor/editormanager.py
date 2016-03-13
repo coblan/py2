@@ -101,22 +101,28 @@ def win_factory(path):
     elif path.endswith('.js'):
         editor=CodeEditor()
         editor.model=QStandardItemModel()          
-        editor.setLexer(LexerJs(editor,editor.model))         
+        editor.setLexer(LexerJs(editor,editor.model))  
+    elif path.endswith('.html'):
+        editor=CodeEditor()
+        editor.model=QStandardItemModel()  
+        
     else:
         return
     editor.path=path
-    text,encoding=open_rt_as_utf8_and_org_encoding(path)
+    text,encoding=open_as_org_encoding_or_utf8(path)
     editor.setText(text) 
     editor.encoding=encoding
     editor.emptyUndoBuff()
     editor.setSavePoint()
     return editor
 
-def open_rt_as_utf8_and_org_encoding(path):
+def open_as_org_encoding_or_utf8(path):
     with open(path) as f:
         text=f.read()
         encoding=chardet.detect(text).get('encoding')
-        if encoding!='utf-8':
+        if not encoding:
+            encoding='utf-8'
+        elif encoding!='utf-8':
             text=text.decode(encoding)
-            text=text.encode('utf-8')  
+            text=text.encode('utf-8') 
     return text,encoding

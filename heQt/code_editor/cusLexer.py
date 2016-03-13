@@ -77,7 +77,10 @@ class CusLexer(QObject):
     
     def setForeColor(self,n,color):
         self.editor.send(const.SCI_STYLESETFORE, n, color)
-    
+    def setBackColor(self,n,color):
+        self.editor.send(const.SCI_STYLESETBACK,n,color)
+        
+        
     def setStyleFont(self, n, font):
         assert isinstance(font, QFont)
         self.send(const.SCI_STYLESETBOLD, n, 1 if font.bold() else 0)

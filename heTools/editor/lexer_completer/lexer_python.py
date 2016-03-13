@@ -5,6 +5,7 @@ from PyQt4.QtGui import QColor,QFont,QStandardItemModel,QStandardItem
 from PyQt4.QtCore import Qt
 import re
 from heStruct.heSignal import connect
+from heQt.code_editor import const
 #if 0:
     #from heQt.code_editor import CodeEditor
 class LexerPython(CusLexer):
@@ -24,16 +25,19 @@ class LexerPython(CusLexer):
         font=QFont(font2)
         font.setBold(True)
         font.setItalic(True)
-        self.setStyleFont(18,font)        
+        self.setStyleFont(18,font) 
+        #self.setBackColor(17,QColor('red'))
+        #self.editor.send(const.SCI_STYLESETEOLFILLED,17,True)
            
     def hightText(self, start, end):
         self.setFormat(start, end, 32)
         text = self.editor.textRange(start, end)
         for i in re.finditer('class|def', text):
+            #self.setFormat(start, end, 17)
             self.setFormat( start+i.start(),start+i.end(),18)  
+            
         for i in re.finditer('#.*?$',text,re.MULTILINE):
             self.setFormat( start+i.start(),start+i.end(),1)  
-        #self._update_outline(start, text)
         self.outline.update_outline_model(start, text)
         
 
