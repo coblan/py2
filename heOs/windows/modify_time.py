@@ -3,7 +3,7 @@
 import socket
 import struct
 import time
-import win32api
+#import win32api
 
 TimeServer = '210.72.145.44' #国家授时中心ip
 Port = 123
@@ -27,5 +27,5 @@ def setSystemTime():
     win32api.SetSystemTime(2016,1,6,16,10,20,0,0)
 
 if __name__ == '__main__':
-    setSystemTime()
-    # print "%d-%d-%d %d:%d:%d" % time.localtime(getTime())[:6]
+    #setSystemTime()
+    print "%d-%d-%d %d:%d:%d" % time.localtime(getTime())[:6]
