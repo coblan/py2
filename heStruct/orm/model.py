@@ -22,15 +22,15 @@ class Meta(type):
 
 class Model(object):
     __metaclass__=Meta
-    db=Sqlite
+    #db=Sqlite
     # 添加一个自增
     autoId = AutoIncrement()
     currentid=None
     def __init__(self,**kw):
+        #self.__dict__.update(kw)
         for k ,v in kw.items():
             setattr(self,k,v)
-        #self.__dict__.update(kw)
-    
+
     @classmethod
     def getField(cls,key):
         for k,v in cls.fields:
@@ -44,9 +44,10 @@ class Model(object):
         cls.cursor.execute(querystr)  
         
     @classmethod
-    def connection(cls,conn):
+    def connection(cls,conn,engine):
         cls.conn = conn
-        cls.cursor = cls.conn.cursor()
+        cls.db=engine
+        #cls.cursor = cls.conn.cursor()
         
     @classmethod
     def commit(cls):
@@ -120,7 +121,7 @@ if __name__ == '__main__':
         #time = MyTimeField(NULL=True)
     conn = sqlite3.connect(':memory:')  
     #conn = sqlite3.connect('dog.db') 
-    test.connection(conn)
+    test.connection(conn,Sqlite)
     test.create()
     
     dc = {"name":'heyulin',"age":34}

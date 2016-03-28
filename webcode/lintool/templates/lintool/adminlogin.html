@@ -1,0 +1,49 @@
+
+{% extends 'lintool/admin.html' %}
+{% block content %}
+<script type="text/javascript">
+	
+		app.controller('content',function ($scope,$http) {
+			$scope.user={}
+			$scope.submit_func=function (valid) {
+				if(valid){
+					var postData = {
+					cmd:'login',
+					user:$scope.user
+				};  
+				$http.post('',postData)
+				.success(function(data, status, headers, config) {  
+				    //加载成功之后做一些事  
+					$scope.stdout="提交成功";
+					if(data.status=='success'){
+						$scope.stdout='登陆成功';
+						location.reload(true)
+					}else{
+						$scope.stdout='用户名，密码不对头'
+					}
+
+				}).error(function(data, status, headers, config) {  
+				    //处理错误 
+				    $scope.stdout='有错误,返回码为:',
+				    $scope.stdout+=status; 
+				});  
+				}
+			}
+		})
+</script>
+<div ng-controller='content'>
+	<form name="logForm" ng-submit='submit_func(logForm.$valid)' novalidate>
+		<div>
+			<label for="name">用户名</label>
+			<input type="text" name="name"  ng-model='user.name' required/>
+		</div>
+		<div>
+			<label for="pswd">密码</label>
+			<input type="password" name="pswd"  ng-model='user.pswd' required/>
+		</div>
+		
+		<input type="submit"  value="提交" ng-disabled='logForm.$invalid'/>
+	</form>
+	<div ng-bind='stdout'></div>
+</div>
+{% endblock %}

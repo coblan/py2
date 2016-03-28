@@ -58,3 +58,10 @@ docs/_build/
 # PyBuilder
 target/
 /heTools/cmdgui/stns
+*.wpr
+/*.wpu
+/heTools/cmdgui/expaned
+/heTools/cmdgui/tmp.bat
+/heTools/cmdgui/tmp.cmd
+/heTools/editor/auto/state
+wingdbstub.py
