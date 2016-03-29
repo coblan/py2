@@ -1,0 +1,106 @@
+
+{% extends 'lintool/admin.html' %}
+{% block content %}
+<script type="text/javascript">
+	
+		app.controller('content',function ($scope,$http,$timeout) {
+			$scope.next="{{next |default:'/'}}";
+			$scope.is_login={{ is_login |default:'false'}}
+			$scope.user={
+				name:'',
+				password:''
+			}
+			//var t1='';
+			//$scope.$watch('stdout',function (nv,ov) {
+			//	if (nv=='')return
+			//	$('#stdout').show();
+			//	if(t1){
+			//		$timeout.cancel(t1);
+			//	}
+			//	t1 =$timeout(function () {
+			//		$('#stdout').fadeOut(1000,function () {
+			//			$scope.stdout='';
+			//		});
+			//	},6000)
+			//})
+			$scope.infome=false;
+			$scope.submit_func=function (valid) {
+				if(!valid)return;
+				if ($scope.user.password1!=$scope.user.password2){
+					$scope.stdout='两次密码不一致';
+					return;
+			}
+				var postData={
+					registe:{username:$scope.user.username,password:$scope.user.password1}
+				}
+				$http.post('',postData)
+				.success(function(data, status, headers, config) {  
+					if(data.registe.status=='success'){
+						location='{{login_url}}';
+					}else{
+						$scope.stdout=data.registe.msg;
+					}
+					
+				}).error(function(data, status, headers, config) {  
+				    //处理错误 
+				    $scope.stdout='有错误,返回码为:',
+				    $scope.stdout+=status; 
+				});  
+				
+			};
+			$scope.eq=function (a,b) {
+			 	return (a==b)
+				};
+			
+		});
+</script>
+<div class='container'>
+	<div ng-controller='content'>
+	<div ng-if='!is_login'>
+		<form name="regForm" ng-submit='submit_func(regForm.$valid)' class='form-signin' novalidate>
+			<h2 class='form-signin-heading'>用户名:</h2>
+			<div class="form-group">
+			    <label for="usrname">Email</label>
+			    <input type="text" class='form-control' name='usrname' placeholder='email/用户名' ng-model='user.username' required autofocus>
+			<p ng-show='regForm.usrname.$error.required'>* 用户名不能为空</p>
+ 			 </div>
+			
+			
+			<div class="form-group">
+			  <label for="pswd1">第一次输入密码</label>
+			  <input type="password" class='form-control' name="pswd1" placeholder='password' ng-model='user.password1' required />
+			  <p ng-show='regForm.pswd1.$error.required'>* 密码不能为空</p>
+			</div>
+
+			
+			<div class="form-group">
+				<label for="pswd2">第二次输入密码</label>
+				<input type="password" class='form-control' name="pswd2" placeholder='password' ng-model='user.password2' required />
+				<p ng-show='user.password1!=user.password2'>两次密码不相等</p>
+			</div>
+			
+	
+			<input type="submit" class='btn btn-lg btn-primary btn-block' value="注册" />
+
+			<p>为了方便，我们假定这个email属于您。只需要输入两次相同密码就注册成功。但是请不要使用不属于您的email登陆，因为可能会使用您登记的email进行某些验证。</p>
+		</form>
+	</div>
+	
+
+	<!--<div id='stdout' ng-bind='stdout' class='form-signin' style='color:red'></div>-->
+	<div auto-hide data='stdout' class='form-signin' style='color:red'></div>
+</div>
+
+</div>
+<style type="text/css">
+	.form-signin{
+		max-width:330px;
+		padding: 15px;
+		margin: 0 auto;
+	}
+	input{
+		margin-bottom:3px;
+	}
+</style>
+
+{% endblock %}

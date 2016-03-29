@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN" ng-app="share">
+
+	<head>
+		<meta charset='utf-8' />
+		<script src="//cdn.bootcss.com/jquery/1.11.3/jquery.min.js"></script>
+		<script src="http://apps.bdimg.com/libs/angular.js/1.4.6/angular.min.js"></script>
+
+		<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.6/angular.min.js"></script>-->
+		<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.6/angular-animate.min.js"></script>-->
+		<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.6/angular-sanitize.min.js"></script>-->
+		<script src="http://apps.bdimg.com/libs/angular.js/1.4.6/angular-sanitize.min.js"></script>
+		
+
+		<script src="/static/lintool/js/admin.js"></script>
+		<title>我的管理界面</title>
+		
+		<bootstrap></bootstrap>
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+		</head>
+		<body >
+			{% block content %}
+	<script type="text/javascript">
+
+		app.controller('content',function ($scope,$http) {
+	
+
+			$scope.superuser={value:'createsuperuser',
+								cmd:'createsuperuser',
+								name:'',
+								pswd:'',
+								stdout:function (data) {
+									$scope.stdout='创建成功';
+								},
+								invalid:function () {
+									return $scope.userform.$invalid;
+								}
+							};
+			$scope.data=[
+					{value:'---'},
+					{value:'migrate',cmd:'remote_cmd'},
+					{value:'makemigrations',cmd:'remote_cmd'},
+					{value:'get_migration_model',
+						cmd:'get_migration_model',
+						stdout:function (data) {
+						$scope.stdout=data.stdout;
+						$scope.items=data.rows;
+					}},
+					$scope.superuser,
+					{value:'collectstatic',cmd:'remote_cmd'}
+					]
+			$scope.selected=$scope.data[0]
+			$scope.run_cmd=function () {
+				if ($scope.selected.value=='---'){
+					return
+				}
+				var postData = {
+					//operation:$scope.selected.cmd,
+					//command:$scope.selected.value
+					
+				};  
+				$http.post('',$scope.selected)
+				.success(function(data, status, headers, config) {  
+				    //加载成功之后做一些事  
+				    if(!$scope.selected.stdout){
+					    $scope.stdout=data.stdout;
+				    }else{
+					    $scope.selected.stdout(data)
+				    }
+				}).error(function(data, status, headers, config) {  
+				    //处理错误 
+				    $scope.stdout='有错误,返回码为:',
+				    $scope.stdout+=status; 
+				});  
+			}
+
+			$scope.edit=function (item) {
+				$scope.tar_item = item
+				
+			};
+			$scope.submit_edit=function () {
+				var postData = {
+					operation:'migrate_model',
+					appid: $scope.tar_item.id,
+					name:$scope.tar_item.name
+				};  
+				$http.post('',postData)
+				.success(function(data, status, headers, config) {  
+				    //加载成功之后做一些事  
+					$scope.stdout="提交成功";
+
+				}).error(function(data, status, headers, config) {  
+				    //处理错误 
+				    $scope.stdout='有错误,返回码为:',
+				    $scope.stdout+=status; 
+				});  
+				
+			};
+			$scope.logout=function () {
+				var postData={
+					cmd:'logout',
+				}
+				$http.post('',postData)
+				.success(function(data, status, headers, config) {  
+				    //加载成功之后做一些事  
+					$scope.stdout="退出提交成功";
+					location.reload(true);
+
+				}).error(function(data, status, headers, config) {  
+				    //处理错误 
+				    $scope.stdout='有错误,返回码为:',
+				    $scope.stdout+=status; 
+				});  
+			}
+	
+		})
+		</script>
+
+		<div ng-controller='content'>
+			<div>
+				 <select ng-model="selected" ng-options="item.value for item in data"></select>
+			</div>
+
+			<button name="syncdb" type="button" value="val" ng-click='run_cmd()'>运行</button>
+			<button name="logout" type="button" value="val" ng-click='logout()'>logout</button>
+			<div id="fgg" class="test" ng-bind-html='stdout'></div>
+			<div>
+				
+
+				<div ng-switch='selected.value'>
+					
+					<div ng-switch-when='get_migration_model'>
+						<form name="editform">
+							<div ng-bind='tar_item.id+"__"+tar_item.app'></div>
+							<input type="text" name="name" value="" ng-model='tar_item.name' required/>
+							<button name="3" type="button" value="val" ng-click='submit_edit()' ng-disabled='editform.$invalid'>提交修改</button>
+							</form>
+						
+							<table class="table table-hover">
+								<tr>
+									<th>编号</th>
+									<th>app</th>
+									<th>文件进度</th>
+									<th>时间</th>
+								</tr>
+								<tr ng-repeat='item in items'>
+									<td>[[item.id]]</td>
+									<td><a href="" ng-click='edit(item)'>[[item.app]]</a></td>
+									<td>[[item.name]]</td>
+									<td>[[item.applied]]</td>
+								</tr>
+							</table>
+					</div>
+
+					<div ng-switch-when='createsuperuser'>
+						<form name="user">
+							<label for="username">用户名<span style='color:red' ng-show='user.username.$error.required'>必填</span></label>
+							<input type="text" name="username" value="" ng-model='superuser.name' required/>
+							<label for="ttww">密码<span style='color:red' ng-show='user.pswd.$error.required'>必填</span></label>
+							<input type="password" name="pswd" value="" ng-model='superuser.pswd' required/>
+						</form>
+					</div>
+					
+				</div>
+		
+			</div>
+		</div>
+
+		{% endblock %}
+
+		</body>
+		</html>

@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="zh-CN" ng-app='he'>
+        <head>
+                <meta charset='utf-8' />
+                <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+                <title>{{title}}</title>
+                <script type="text/javascript">
+                        is_local='{{local}}';
+                        function loadjs(script_filename) {
+                        document.write('\<script language="javascript" type="text/javascript" src="' + script_filename + '"\>\</script\>');
+                    } 
+                    if(!is_local){static_url='/static';}
+                    else{ static_url='../../static';}
+                    // 加载所有微信页面需要的js和css
+                    loadjs(static_url+'/js/weixin_js_css.js')
+                </script>
+                
+                <script type="text/javascript">
+                        app.filter('kick_out_inn_user',function(){
+                            return function(inputArray,inn_array){
+                                    if(!inn_array){
+                                            return inputArray;
+                                        }else{
+                                                var inn_name=inn_array.map(
+                                                function(a) {return a.username;}
+                                        )
+                                            return inputArray.filter(
+                                                function (a) {
+                                                        return inn_name.indexOf(a.username)==-1
+                                            })
+                                        }
+                            }
+                        });
+                        app.controller('content',function ($scope,$http,$window,$location) {
+                                if(is_local){
+                                        $scope.img_url='../../static/image/'
+                                }else{
+                                        $scope.img_url='/static/image/'
+                                }
+                                if(is_local){
+                                        $scope.groups=[
+                                                {name:'何家人',
+                                                        users:[{username:'heyulin81',nickname:'好儿童'},
+                                                                        {username:'zhangrong',nickname:'张荣'}]
+                                                },	
+                                                {name:'张家人',
+                                                        users:[{username:'heyulin81',nickname:'好儿童'},
+                                                                        {username:'zhangrong',nickname:'张荣'}]
+                                                },	
+                                        ]
+                                        $scope.all_users=[
+                                                {username:'heyulin81',nickname:'好儿童'},
+                                                {username:'zhangrong',nickname:'张荣'},
+                                                {username:'heyulin',nickname:'何宇您'},
+                                                {username:'heyulin12',nickname:'何宇您'}]
+                                        $scope.img_url='../../static/image/'
+                                }else{
+                                        // 从服务器初始化
+                                        var post_url='/info/ajax/';
+                                        function init_from_server() {
+                                                        var post_data = {
+                                                                        get_guanzhu_list:{},
+                                                                        get_group_all:{}
+                                                                };  
+                                                        $http.post(post_url,post_data)
+                                                        .success(function(data, status, headers, config) { 
+                                                                $scope.all_users=data.get_guanzhu_list.items;
+                                                                $scope.groups=data.get_group_all.groups;
+                                                        }).error(function(data, status, headers, config) {  
+                                                            $scope.inform.info('有错误,返回码为:'+status);
+                                                        });
+                                        }
+                                        init_from_server();
+                                        //--------------------------------------
+                                }
+                        $scope.add_group=function (name) {
+                                $scope.show_add_group_form=false;
+                                var post_data = {
+                                                create_group:{name:name}
+                                        };  
+                                $http.post(post_url,post_data)
+                                .success(function(data, status, headers, config) { 
+                                        $scope.inform.info('ok')
+                                }).error(function(data, status, headers, config) {  
+                                    $scope.std='有错误,返回码为:'+status;
+                                });
+                        }
+                        $scope.finish=function (b) {
+                                $scope.show_form=false;
+                                if(b){
+                                        update($scope.current_group,$scope.current_group.org)
+
+                                        var post_data = {
+                                                update_group:{
+                                                                name:$scope.current_group.name,
+                                                                users:$scope.current_group.users}
+                                        };  
+                                        $http.post(post_url,post_data)
+                                        .success(function(data, status, headers, config) { 
+                                                $scope.inform.info('ok')
+                                        }).error(function(data, status, headers, config) {  
+                                            $scope.std='有错误,返回码为:'+status;
+                                        });
+                                        
+                                }
+                        }
+                        $scope.sel_finish=function (b) {
+                                $scope.select_form_show=false;
+                                $scope.show_form=true;
+                                for(x in $scope.all_users){
+                                        if($scope.all_users[x].selected){
+                                                $scope.current_group.org.users.push($scope.all_users[x])
+                                                $scope.all_users[x].selected=false;
+                                        }
+                                }
+                        }
+                        $scope.show_select_form=function (b) {
+                                $scope.select_form_show=true;
+                                $scope.show_form=false;
+                        }
+                        $scope.edit=function (record) {
+                                $scope.show_form=true;
+                                $scope.current_group=copy(record);
+                                $scope.current_group.org=record
+                                }
+                        $scope.del_user_from_group=function (user) {
+                                $scope.current_group.users=
+                                        $scope.current_group.users.filter(function (each_user) {
+                                                return each_user!=user;
+                                        })
+                        }
+                        })
+                        
+                        function copy(src) {
+                                dst={}
+                                for( x in src){
+                                        dst[x]=src[x]
+                                }
+                                return dst;
+                        }
+                        function update(src,dst) {
+                                for( x in src){
+                                        dst[x]=src[x]
+                                }
+                        }
+                </script>
+<style type="text/css" media="screen" id="test">
+        .record-panel{
+
+                border-radius: 5px;
+        }
+        .no-border-table th{
+                padding-top:30px !important;
+        }
+        .head-name{
+                /*margin-left:20px;*/
+                font-size: 125%;
+                position: relative;
+                left:-20px;
+        }
+        
+        .active{
+                padding: 5px;
+                color: #930;
+                text-align: center;
+                border-bottom: 3px solid #0cc;
+        }
+        .not-active{
+                padding: 5px;
+                text-align: center;
+                border-bottom: 2px solid #CCC;
+                color: #ccc;
+        }
+
+        .cell-wrap:after{
+           content:".";
+           height:0;
+           visibility:hidden;
+           display:block;
+           clear:both;
+        }
+        .no-border-table td{
+                border-top: none !important;
+                
+        }
+        
+        .first-col{
+                width:20px;
+        }
+        .btn-panel{
+                text-align: center;
+                padding: 20px;
+        }
+        .middle-img{
+                text-align: center;
+                margin:30px;
+        }
+</style>
+</head>
+<body ng-controller='content' >
+                <!-----------------弹出框------------------------>
+        <div inform self='inform' width='50%'></div>
+        <div assure-form self='assure' width='50%'></div>
+
+                <!-----------------在这里填写内容------------------------>
+        <div class='container'>
+                <div class='row'>
+                        <div class='not-active col-xs-4 col-xs-offset-2'>
+                                <span>人员</span>
+                        </div>
+                        <div class='active col-xs-4'>
+                                <span>分组</span>
+                        </div>
+                </div>
+
+                <div class='middle-img'>
+                        <img ng-src="[[img_url+'add.png']]" width="80px" height="80px" ng-click='show_add_group_form=true' />
+                </div>
+                
+                
+                <table class='table no-border-table' ng-repeat='group in groups'>
+                        <thead class='record-panel'>
+                                <tr>
+                                        <th class='first-col'></th>
+                                        <th><span ng-bind='group.name' class='head-name'></span></th>
+                                        <th></th>
+                                        <th>
+                                                <img ng-src="[[img_url+'edit.png']]" 
+                                                style='width:20px;height:20px;'
+                                                ng-click='edit(group)'>
+                                        </th>
+                                </tr>
+                        </thead>
+                        <tbody>
+                                <tr ng-repeat='user in group.users' class='cell-wrap'>
+                                        <td class='first-col'></td>
+                                        <td>
+                                                <span ng-bind='user.username' class='mycell'></span>
+                                        </td>
+                                        <td>
+                                                <span ng-bind='user.nickname' class='mycell'></span>
+                                        </td>
+                                </tr>
+                        </tbody>
+                </table>
+
+        <!--编辑框-->
+        <div model-form width='90%' ng-show='show_form'>
+                <table class='table no-border-table'>
+                        <thead>
+                                <tr>
+                                        <th class='first-col'></th>
+                                        <th>
+                                                <span ng-bind='current_group.name' 
+                                                        class='head-name'>
+                                                </span>
+                                        </th>
+                                        <th></th>
+                                        <th>
+                                                <img ng-src="[[img_url+'del.png']]" 
+                                                        style='width:20px;'>
+                                        </th>
+                                </tr>
+                                <!--<hr style='float: left;width:110%'>-->
+                        </thead>
+                        <tbody>
+                                <tr ng-repeat='user in current_group.users'>
+                                        <td class='first-col'></td>
+                                        <td><span ng-bind='user.username'></span></td>
+                                        <td><span ng-bind='user.nickname'></span></td>
+                                        <td>
+                                                <img ng-src="[[img_url+'del.png']]" 
+                                                        style='width:20px;' 
+                                                        ng-click='del_user_from_group(user)'>
+                                        </td>
+                                </tr>
+                                <tr>
+                                        <td class='first-col'></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>
+                                                <img ng-src="[[img_url+'little_add.png']]" 
+                                                        style='width:20px;' ng-click='show_select_form(true)'>
+                                        </td>
+                                </tr>
+                        </tbody>
+                </table>
+                
+                <div class='btn-panel'>
+                        <button type="button" class="btn btn-success" style='margin-right:10px;width:100px' ng-click='finish(true)'>确定</button>
+                        <button type="button" class="btn btn-default" style='margin-left:10px;width:100px' ng-click='finish(false)'>取消</button>
+                                
+                </div>
+        </div>
+
+        <!--第二个编辑框-->
+        <div model-form width='90%' ng-show='select_form_show'>
+                <table class='table no-border-table'>
+                        <tr ng-repeat='user in all_users | kick_out_inn_user :current_group.users'>
+                                <td>
+                                         <input type="checkbox" ng-model='user.selected'>
+                                </td>
+                                <td><span ng-bind='user.username'></span></td>
+                                <td><span ng-bind='user.nickname'></span></td>
+                        </tr>
+                </table>
+                
+                <div class='btn-panel'>
+                        <button type="button" class="btn btn-success" style='margin-right:10px;width:100px' ng-click='sel_finish(true)'>确定</button>
+                        <button type="button" class="btn btn-default" style='margin-left:10px;width:100px' ng-click='sel_finish(false)'>取消</button>
+                                
+                </div>
+        </div>
+
+        <div model-form width='90%' ng-show='show_add_group_form'>
+                <div>
+                        <input type="text" name="test" value="" ng-model='new_group_name'/>
+                </div>
+                <button name="test" type="button" value="val" ng-click='add_group(new_group_name)'>添加组</button>
+        </div>
+        </div>
+        
+        </div>
+
+                
+        </body>
+</html>

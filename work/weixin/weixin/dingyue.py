@@ -2,8 +2,8 @@
 import requests
 
 def main():
-    crt_token = 'Eo1Df_nzwyiVKH2IpfHrfjhj_yBpaPBgY9wCh8hgbYZrdMg2bWZ7aAiF-9iFy6fOYAYHx4d5kY5gv5iUYL5quLDNwcLzrqim8K92q1Qmq7UGNJcAFASZV'
-    # access_token()
+    crt_token = 'S91jIU6LxdGSU1h3RqXbGSeVylaNna7ZhgaezVzgXHF-g_sHintDeLYvK2B9Nnt4jw8OtdoySFnBkyNsnsec1FkmZ8Hd_5SuPPeEWdHqViYSZMcACAGNA'
+    #access_token()
     # 发送文件到服务器
     #send_media(crt_token,'image',r'D:\try\imgproc\test1.jpg')
     
@@ -123,9 +123,8 @@ def send(token):
     """
     rq = requests.post(url,data)
     print(rq.text)
-    
 
-# def add_menu(token):
+def add_menu(token):
     '添加菜单'
     url = r"https://api.weixin.qq.com/cgi-bin/menu/create?access_token="+token
     data ="""
@@ -133,37 +132,54 @@ def send(token):
          "button":[
          {	
               "type":"view",
-              "name":"moki",
-              "url":"http://coblan.sinaapp.com/jdk/"
+              "name":"进入1",
+              "url":"http://sharelife.applinzi.com/info/wx/index/"
           },
-          {
-               "name":"菜单",
-               "sub_button":[
-               {	
-                   "type":"view",
-                   "name":"测试网页跳转n",
-                   "url":"https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx7080c32bd10defb0&redirect_uri=http%3a%2f%2fcoblan.sinaapp.com%2fnianhui%2f&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect"
-                },
-               {	
-                   "type":"view",
-                   "name":"测试H",
-                   "url":"http://coblan.sinaapp.com/hello/"
-                },
-                {
-                   "type":"view",
-                   "name":"请假",
-                   "url":"http://coblan.sinaapp.com/journey/"
-                },
-                {
-                   "type":"click",
-                   "name":"赞一下我们",
-                   "key":"V1001_GOOD"
-                }]
-           }]
+           ]
      }
     """
     rq = requests.post(url, data=data)
     print(rq.text)
+
+#def add_menu(token):
+    #'添加菜单'
+    #url = r"https://api.weixin.qq.com/cgi-bin/menu/create?access_token="+token
+    #data ="""
+    #{
+         #"button":[
+         #{	
+              #"type":"view",
+              #"name":"moki",
+              #"url":"http://coblan.sinaapp.com/jdk/"
+          #},
+          #{
+               #"name":"菜单",
+               #"sub_button":[
+               #{	
+                   #"type":"view",
+                   #"name":"测试网页跳转n",
+                   #"url":"https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx7080c32bd10defb0&redirect_uri=http%3a%2f%2fcoblan.sinaapp.com%2fnianhui%2f&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect"
+                #},
+               #{	
+                   #"type":"view",
+                   #"name":"测试H",
+                   #"url":"http://coblan.sinaapp.com/hello/"
+                #},
+                #{
+                   #"type":"view",
+                   #"name":"请假",
+                   #"url":"http://coblan.sinaapp.com/journey/"
+                #},
+                #{
+                   #"type":"click",
+                   #"name":"赞一下我们",
+                   #"key":"V1001_GOOD"
+                #}]
+           #}]
+     #}
+    #"""
+    #rq = requests.post(url, data=data)
+    #print(rq.text)
 
 
 def test_local():

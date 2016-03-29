@@ -2,14 +2,16 @@
 from heQt.qteven import *
 import sys
 import os
-from subprocess import Popen
+from subprocess import Popen,PIPE
 from string import Template
 from PyQt4.QtGui import QTreeView, QStandardItemModel, QSplitter, QMessageBox, QApplication, QTextEdit, QStandardItem,\
      QAction,QMenu
-from PyQt4.QtCore import QObject, Qt, QSettings, QModelIndex
+from PyQt4.QtCore import QObject, Qt, QSettings, QModelIndex,QProcess,QUrl
+from PyQt4.QtGui import QDesktopServices
 from heQt.model.stdmodel import save_model,load_model,walk,childs
 import pickle
 import json
+import subprocess
 
 class CmdWin(QSplitter):
     
@@ -118,13 +120,18 @@ class Logic(QObject):
         scope = {}
         exec (self.info.toPlainText(), scope)
         cmd = scope.get("cmd", "can'g find cmd!")
-        f = open('tmp.bat', 'w')
+        f = open('tmp.cmd', 'w')
         if 'var' in scope:
             cmd = Template(cmd).substitute(scope["var"])
 
         f.write(cmd)
         f.close()
-        Popen('cmd /k %s/tmp.bat' % os.getcwd(), universal_newlines=True)
+        Popen('cmd /k %s/tmp.cmd' % os.getcwd(), universal_newlines=True,shell=True)
+        #import webbrowser
+        #webbrowser.open('file:///%s/tmp.cmd' % os.getcwd())
+
+
+  
 
     def save(self):
         idx = self.tree.currentIndex()
