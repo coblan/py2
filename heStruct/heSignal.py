@@ -1,4 +1,29 @@
 # -*- encoding:utf-8 -*-
+"""
+考虑到，可追溯性，所以Signal设计为一个类的形式，在使用时都会生成一个对象，从而达到可追溯的目的。最初的字符串的形式，是不能达到这种目的的。
+
+Example: 
+A类发送信号，B类接受
+class A:
+    def __init__(self):
+        self.edited=Signal('text',edtor='heyulin')    # 关键字参数，起到了赋值default的作用
+    
+    def setText(self,text):
+        dosome_edit_work(text)
+        self.edited.emit(text)    # recived function= func(text=text,editor='heyulin')
+        
+        #self.edited.emit(text,editor='zhangrong')    # recived function= func(text=text,editor='zhangrong')
+
+# Client
+class B:
+    def __init__(self):
+        editor=A()
+        editor.edited.connect(self.dosomething)   # 链接信号
+        
+    def dosomething(self,**kw):   # 有些handler参数较signal.emit少，所以需要加上**kw关键字参数，否则python会报错。
+        ...
+
+"""
 
 class Signal(object):
     def __init__(self,*args,**kw):
@@ -34,6 +59,11 @@ class Signal(object):
         
         for fun in self.funcs:
             fun(**kw)
+
+
+##########################
+#下面的代码不再使用
+##########################
 
 dc={}
 cnt=0
