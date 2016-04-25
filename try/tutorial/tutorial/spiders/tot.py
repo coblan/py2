@@ -1,7 +1,9 @@
 import scrapy
-from scrapy.contrib.spiders import CrawlSpider, Rule
-from scrapy.contrib.linkextractors import LinkExtractor
-
+# from scrapy.contrib.spiders import CrawlSpider, Rule
+from scrapy.spiders import CrawlSpider,Rule
+# from scrapy.contrib.linkextractors import LinkExtractor
+from scrapy.linkextractors import LinkExtractor
+from items import TutorialItem
 # class Baidu(scrapy.Spider):
     # name='baidu'
     # allowed_domains =['baidu.com']
@@ -31,5 +33,6 @@ class Baidu(CrawlSpider):
         print(response.url)
         for i in response.xpath('//img/@src'):
             print(i)
+            yield TutorialItem(link=i)
         # for i in response.xpath('//a/@href'):
             # print(i.extract())
