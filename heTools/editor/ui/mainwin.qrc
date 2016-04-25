@@ -1,6 +1,6 @@
 <RCC>
   <qresource prefix="image">
-    <file>image/redo_64px_1188145_easyicon.net.ico</file>
-    <file>image/undo_64px_1188189_easyicon.net.ico</file>
+    <file>redo_128px_1175650_easyicon.net.ico</file>
+    <file>undo_128px_1175681_easyicon.net.ico</file>
   </qresource>
 </RCC>

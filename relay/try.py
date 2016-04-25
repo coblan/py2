@@ -1,7 +1,4 @@
-import sys
-from PyQt4.QtGui import *
-if __name__ =='__main__':
-    app = QApplication(sys.argv)
-    win = QWidget()
-    win.show()
-    sys.exit(app.exec_())
+with open('english.txt') as f:
+    en=f.read()
+    en_list=en.split('\n')
+    print(en_list)

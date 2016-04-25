@@ -32,6 +32,18 @@ class MainWin(QMainWindow,Ui_MainWindow):
         self.actionRedo.triggered.connect(self.editors.redo)
         self.editors.undoStateChanged.connect(self.set_undo_state)
         self.editors.currentEncodeChanged.connect(self.show_encoding)
+        self.act_add_leftPanel.triggered.connect(self.add_left_panel)
+        self.act_add_bottomPanel.triggered.connect(self.add_bottom_panel)
+        self.act_add_rightPanel.triggered.connect(self.add_right_panel)
+    
+    def add_left_panel(self):
+        self.dock.addLeft(DockPanel())
+        
+    def add_bottom_panel(self):
+        self.dock.addMiddle(DockPanel())
+    
+    def add_right_panel(self):
+        self.dock.addRight(DockPanel())
         
     def set_undo_state(self,undo,redo):
         self.actionUndo.setEnabled(undo)

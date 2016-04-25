@@ -34,7 +34,16 @@
     <addaction name="actionSave"/>
     <addaction name="actionSave_all"/>
    </widget>
+   <widget class="QMenu" name="menuDock">
+    <property name="title">
+     <string>dock</string>
+    </property>
+    <addaction name="act_add_leftPanel"/>
+    <addaction name="act_add_bottomPanel"/>
+    <addaction name="act_add_rightPanel"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuDock"/>
   </widget>
   <widget class="QStatusBar" name="stat_bar"/>
   <widget class="QToolBar" name="toolBar">
@@ -85,7 +94,7 @@
   <action name="actionUndo">
    <property name="icon">
     <iconset resource="mainwin.qrc">
-     <normaloff>:/image/image/undo_64px_1188189_easyicon.net.ico</normaloff>:/image/image/undo_64px_1188189_easyicon.net.ico</iconset>
+     <normaloff>:/image/undo_128px_1175681_easyicon.net.ico</normaloff>:/image/undo_128px_1175681_easyicon.net.ico</iconset>
    </property>
    <property name="text">
     <string>undo</string>
@@ -94,10 +103,25 @@
   <action name="actionRedo">
    <property name="icon">
     <iconset resource="mainwin.qrc">
-     <normaloff>:/image/image/redo_64px_1188145_easyicon.net.ico</normaloff>:/image/image/redo_64px_1188145_easyicon.net.ico</iconset>
+     <normaloff>:/image/redo_128px_1175650_easyicon.net.ico</normaloff>:/image/redo_128px_1175650_easyicon.net.ico</iconset>
    </property>
    <property name="text">
     <string>redo</string>
+   </property>
+  </action>
+  <action name="act_add_leftPanel">
+   <property name="text">
+    <string>添加左侧dock</string>
+   </property>
+  </action>
+  <action name="act_add_bottomPanel">
+   <property name="text">
+    <string>添加下部dock</string>
+   </property>
+  </action>
+  <action name="act_add_rightPanel">
+   <property name="text">
+    <string>添加右边dock</string>
    </property>
   </action>
  </widget>
