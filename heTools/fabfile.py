@@ -19,17 +19,19 @@ def first():
 import wingdbstub
 
 def push():
-    with settings(warn_only=True):
-        with lcd(r'D:\coblan\web\first'):
-            _auto_push()
-        
-        with lcd(r'D:\coblan\py2'):
-            _auto_push()
-        
-        with lcd(r'D:\coblan\webcode'):
-            _auto_push()
+    #with settings(warn_only=True):
+    with lcd(r'D:\coblan\web\first'):
+        _auto_push()
+    
+    with lcd(r'D:\coblan\py2'):
+        _auto_push()
+    
+    with lcd(r'D:\coblan\webcode'):
+        _auto_push()
 
 def _auto_push():
-    local('git add .')
-    local('git commit -m "auto commit"')
-    local('git push')    
+    rt = local('git status',capture=True)
+    if not rt.stdout.endswith('nothing to commit, working directory clean'):
+        local('git add .')
+        local('git commit -m "auto commit"')
+        local('git push')    
