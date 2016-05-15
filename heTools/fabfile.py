@@ -34,5 +34,4 @@ def _auto_push():
     if not rt.stdout.endswith('nothing to commit, working directory clean'):
         local('git add .')
         local('git commit -m "auto commit"')
-    rt=local('git push',capture=True)  
-    print(rt)
+    local('git push')  
