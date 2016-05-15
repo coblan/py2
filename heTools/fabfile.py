@@ -19,18 +19,18 @@ def first():
 import wingdbstub
 
 def push():
-    #with settings(warn_only=True):
-    with lcd(r'D:\coblan\web\first'):
-        print('start push first')
-        _auto_push()
-    
-    with lcd(r'D:\coblan\py2'):
-        print('start push py2')
-        _auto_push()
-    
-    with lcd(r'D:\coblan\webcode'):
-        print('start push webcode')
-        _auto_push()
+    with settings(warn_only=True):
+        with lcd(r'D:\coblan\web\first'):
+            print('start push first')
+            _auto_push()
+        
+        with lcd(r'D:\coblan\py2'):
+            print('start push py2')
+            _auto_push()
+        
+        with lcd(r'D:\coblan\webcode'):
+            print('start push webcode')
+            _auto_push()
 
 def _auto_push():
     rt = local('git status',capture=True)
@@ -39,3 +39,4 @@ def _auto_push():
         local('git commit -m "auto commit"',capture=True)
     rt = local('git push',capture=True)
     print(rt.stdout)
+    
