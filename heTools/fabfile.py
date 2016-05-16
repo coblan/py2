@@ -1,5 +1,5 @@
 
-from fabric.api import local, settings,lcd,env,cd,get,put
+from fabric.api import local, settings,lcd,env,cd,get,put,prefix
 from fabric.api import run
 
 env.hosts = ['coblan@enjoyst.com']
@@ -7,10 +7,11 @@ env.passwords={'coblan@enjoyst.com:22':'he7125158'}
 
 def first():
     with lcd(r'D:\coblan\web\first'):
-        local(r'D:\ve\first\Scripts\activate.bat')
-        local('git add .')
-        local('git commit -m "auto commit"')
-        local('git push')
+        with prefix(r'D:\ve\first\Scripts\activate.bat'):
+            local('pip list')
+            local('git add .')
+            local('git commit -m "auto commit"')
+            local('git push')
     with cd('/pypro/first/first'):
         run('git pull')
         with cd('../run'):

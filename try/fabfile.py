@@ -4,22 +4,35 @@ from fabric.api import local, settings,lcd,env,cd,get,put
 from fabric.api import run
 import wingdbstub
 
-env.hosts = ['coblan@enjoyst.com']
-env.passwords={'coblan@enjoyst.com:22':'he7125158'}
+def first():
+    env.hosts = ['coblan@enjoyst.com']
+    env.passwords={'coblan@enjoyst.com:22':'he7125158'}
 
-prompts={"Username for 'https://git.oschina.net':": 'coblan@163.com','Password':'he7125158','show me':'wowo\n'}
+
+def deploy():
+    run('ls -al')
 
 def prepare_deploy():
     #local("dir")
-    with settings(warn_only=True,prompts=prompts):
-        tt()
-        with lcd(r'D:\coblan\webcode'):
-            local('git add .',capture=True)
-            #rt2=local('git commit -m "test fabric"')
-            rt2= local('git push',capture=True)
-    print(rt2.stdout)
-    print(rt.stderr )
+    with settings(warn_only=True):
+        #tt()
+        modify()
+        env.passwords={'dsg':'sdgdsg'}
+        print(env.hosts)
+        print(env.passwords)
+        run('ls -al')
+    print(env.hosts)
+    print(env.passwords)
+    run('ls -al')
+        #with lcd(r'D:\coblan\webcode'):
+            #local('git add .',capture=True)
+            ##rt2=local('git commit -m "test fabric"')
+            #rt2= local('git push',capture=True)
+    #print(rt2.stdout)
+    #print(rt.stderr )
 
+def modify():
+    env.hosts=['dog@dog.om']
 
 def host_type():
     with cd('/pypro/first/'):
