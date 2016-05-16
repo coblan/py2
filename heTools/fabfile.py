@@ -38,6 +38,12 @@ def _auto_push():
     if not rt.stdout.endswith('nothing to commit, working directory clean'):
         local('git add .',capture=True)
         local('git commit -m "auto commit"',capture=True)
-    rt = local('git push',capture=True)
-    print(rt.stdout)
+    local('git push')
+
+def pull():
+    ls=[r'D:\coblan\web\first',r'D:\coblan\py2',r'D:\coblan\webcode']
+    for path in ls:
+        with lcd(path):
+            local('git pull')
+
     
