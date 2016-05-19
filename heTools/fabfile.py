@@ -8,7 +8,8 @@ env.passwords={'coblan@enjoyst.com:22':'he7125158'}
 def first():
     with lcd(r'D:\coblan\web\first'):
         with prefix(r'D:\ve\first\Scripts\activate.bat'):
-            local('pip list')
+            local('python manage.py collectstatic --noinput')
+            #local('pip list')
             local('git add .')
             local('git commit -m "auto commit"')
             local('git push')
