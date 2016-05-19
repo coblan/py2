@@ -29,7 +29,7 @@ def transfer(x):
 
 
 def learn(w,d,o,x):
-    # 这里就是简单的LMS学习算法
+    # 这里就是最简单的δ学习算法
     print(d-o)
     return w+ 0.1*(d-o)*x
 
