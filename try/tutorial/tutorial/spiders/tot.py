@@ -3,7 +3,7 @@ import scrapy
 from scrapy.spiders import CrawlSpider,Rule
 # from scrapy.contrib.linkextractors import LinkExtractor
 from scrapy.linkextractors import LinkExtractor
-from items import TutorialItem
+from ..items import TutorialItem
 # class Baidu(scrapy.Spider):
     # name='baidu'
     # allowed_domains =['baidu.com']
