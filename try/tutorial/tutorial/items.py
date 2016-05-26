@@ -21,4 +21,6 @@ class LinkItem(scrapy.Item):
 
 class ImgItem(scrapy.Item):
     image_urls = scrapy.Field()
-    images = scrapy.Field()    
+    images = scrapy.Field()  
+    file_urls = scrapy.Field()
+    file= scrapy.Field()
