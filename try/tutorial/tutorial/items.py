@@ -14,3 +14,11 @@ class TutorialItem(scrapy.Item):
     title = scrapy.Field()
     link = scrapy.Field()
     desc = scrapy.Field()
+
+class LinkItem(scrapy.Item):
+    link=scrapy.Field()
+    
+
+class ImgItem(scrapy.Item):
+    image_urls = scrapy.Field()
+    images = scrapy.Field()    
