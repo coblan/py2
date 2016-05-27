@@ -18,6 +18,6 @@ class MyPipeline(object):
     def process_item(self, item, spider):
         print('wa haha')
         print(item)
-        self.file.write(item.get('link'))
+        self.file.write(item.get('link')+'\n')
         return item
 

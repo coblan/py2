@@ -1,5 +1,5 @@
 import scrapy
-import wingdbstub
+# import wingdbstub
 
 class StackOverflowSpider(scrapy.Spider):
     name = 'stack'
