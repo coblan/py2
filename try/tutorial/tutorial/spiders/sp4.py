@@ -3,7 +3,7 @@ import scrapy
 from scrapy.spiders import Spider,Rule
 from scrapy.linkextractors import LinkExtractor
 from ..items import LinkItem
-import wingdbstub
+#import wingdbstub
 
 class LocalTest(Spider):
     name='cuslocal'

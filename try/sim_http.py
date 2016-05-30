@@ -1,7 +1,7 @@
 import SimpleHTTPServer
 import SocketServer
 import os
-os.chdir(r'D:\try\localweb')
+os.chdir(r'D:\try')
 PORT = 3456
 
 Handler = SimpleHTTPServer.SimpleHTTPRequestHandler
