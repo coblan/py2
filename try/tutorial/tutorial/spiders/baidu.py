@@ -5,7 +5,7 @@ import scrapy
 from scrapy.spiders import CrawlSpider,Rule
 from scrapy.linkextractors import LinkExtractor
 from ..items import LinkItem
-#import wingdbstub
+import wingdbstub
 
 class GpSearch(CrawlSpider):
     name='baidu'
@@ -44,9 +44,18 @@ class GpSearch(CrawlSpider):
             #yield i        
     
     def parse_item(self, response):
-        l=LinkItem(link = response.url)
-        for i in response.css('title'):
-            l['title']=i.extract()
-        yield l
+        #l=LinkItem(link = response.url)
+        #for i in response.css('title'):
+            #l['title']=i.extract()
+        #yield l
+        
+               
+        for email in response.selector.re('\w+@\w+.\w+'):
+            l = LinkItem()
+            for i in response.css('title'):
+                l['title']=i.extract()             
+            l['link']=email
+            
+            yield l
         # print(response.url)
     

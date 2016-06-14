@@ -19,3 +19,4 @@ class MyPipeline(object):
         self.file.write(unicode(item).encode('utf8')+'\n')
         return item
 
+
