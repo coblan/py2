@@ -22,7 +22,7 @@ from ..items import TutorialItem
             # f.write(response.body)    
 
 class Baidu(CrawlSpider):
-    name='baidu'
+    name='baiduss'
     #allowed_domains =['mokitech.com']
     #start_urls =['http://www.mokitech.com/']
     start_urls=[r'http://book.douban.com/subject/1626306/','https://www.aliyun.com/']

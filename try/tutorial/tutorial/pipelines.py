@@ -13,11 +13,10 @@ class TutorialPipeline(object):
 
 class MyPipeline(object):
     def __init__(self):
-        self.file=open('d:/try/fuck.txt','w')
+        self.file=open('d:/try/fuckME.txt','w')
         
     def process_item(self, item, spider):
-        print('wa haha')
-        print(item)
-        self.file.write(item.get('link')+'\n')
+        self.file.write(unicode(item).encode('utf8')+'\n')
         return item
+
 

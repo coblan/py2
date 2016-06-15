@@ -16,8 +16,13 @@ class TutorialItem(scrapy.Item):
     desc = scrapy.Field()
 
 class LinkItem(scrapy.Item):
+    title=scrapy.Field()
     link=scrapy.Field()
     
+    def __unicode__(self):
+        return self.get('title') + '\t' + self.get('link')
+
+
 
 class ImgItem(scrapy.Item):
     image_urls = scrapy.Field()
