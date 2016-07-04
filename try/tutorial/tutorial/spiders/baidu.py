@@ -4,7 +4,7 @@ import scrapy
 
 from scrapy.spiders import CrawlSpider,Rule
 from scrapy.linkextractors import LinkExtractor
-from ..items import LinkItem
+from ..items import LinkItem,EmailItem
 import wingdbstub
 
 class GpSearch(CrawlSpider):
@@ -21,12 +21,13 @@ class GpSearch(CrawlSpider):
         
     )
     custom_settings={
+        'CONCURRENT_REQUESTS' : 100,
         'DEPTH_LIMIT':2,
         'USER_AGENT': "Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.93 Safari/537.36",
         # 'IMAGES_STORE': 'D:/try/image',
         #'FILES_STORE' : 'D:/try/path',
         'ITEM_PIPELINES':{
-            'tutorial.pipelines.MyPipeline':100
+            'tutorial.pipelines.EmailPipline':100
         },
         
     }
@@ -51,10 +52,10 @@ class GpSearch(CrawlSpider):
         
                
         for email in response.selector.re('\w+@\w+.\w+'):
-            l = LinkItem()
+            l = EmailItem()
             for i in response.css('title'):
                 l['title']=i.extract()             
-            l['link']=email
+            l['email']=email
             
             yield l
         # print(response.url)

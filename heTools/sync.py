@@ -1,3 +1,5 @@
+# -*- encoding:Utf-8 -*-
+
 from heOs.syndir import SynCopy,SynDel
 import sys
 import argparse
@@ -51,4 +53,6 @@ def main():
         s=CustomSync(dst,src)
         s.run()
 
-main()
+
+if __name__=='__main__':
+    main()

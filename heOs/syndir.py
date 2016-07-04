@@ -10,18 +10,6 @@ from os.path import *
 import shutil
 from heStruct.heSignal import Signal
 
-#def sud_exclude(_from,_to):
-    #"""简便函数，用作copy的默认判断函数，能够判断修改时间的先后"""
-    #return exists(_to) and not int(getmtime(_from))>int(getmtime(_to))
-
-#def filter_not_modify(func):
-    #def _func(*args,**kw):
-        #if sud_exclude(*args,**kw) or func is None:
-            #return True
-        #else:
-            #return func(*args,**kw)
-    #return _func
-
 class SynCopy(object):
     def __init__(self,src,dst):
         self.success_update=Signal('src','dst')
@@ -30,6 +18,7 @@ class SynCopy(object):
         
     def should_include_dir(self,src_dir):
         """
+        @src_dir:
         overwrite  to  指定需要包含的 目录
         """
         return True
