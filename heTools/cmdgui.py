@@ -119,19 +119,11 @@ class Logic(QObject):
     def run(self):
         scope = {}
         exec (self.info.toPlainText(), scope)
-        cmd = scope.get("cmd", "can'g find cmd!")
-        f = open('tmp.cmd', 'w')
-        if 'var' in scope:
-            cmd = Template(cmd).substitute(scope["var"])
-
-        f.write(cmd)
-        f.close()
-        Popen('cmd /k %s/tmp.cmd' % os.getcwd(), universal_newlines=True,shell=True)
-        #import webbrowser
-        #webbrowser.open('file:///%s/tmp.cmd' % os.getcwd())
-
-
-  
+        cmd = scope.pop("cmd", 'echo "can not find cmd!"')
+        cmd = cmd.format(**scope)
+        with open('tmp.cmd', 'w') as f:
+            f.write(cmd)
+            Popen('cmd /k %s/tmp.cmd' % os.getcwd(), universal_newlines=True,shell=True)
 
     def save(self):
         idx = self.tree.currentIndex()

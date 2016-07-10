@@ -1,3 +1,3 @@
 from scrapy.cmdline import execute
-import wingdbstub
+#import wingdbstub
 execute()

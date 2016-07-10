@@ -1,58 +1,55 @@
 # -*- encoding:Utf-8 -*-
-
+#import wingdbstub
 from heOs.syndir import SynCopy,SynDel
 import sys
+import json
+
 import argparse
 from datetime import datetime
 import time
 #from peewee import *
 from os.path import getmtime
 import os.path
+
 parser = argparse.ArgumentParser() 
-parser.add_argument("f", help="echo the string you use here") 
+parser.add_argument("-s", help="source dir") 
+parser.add_argument("-d", help="dest dir") 
+parser.add_argument('-c',"--conf", help="input config file ,json formate") 
 args = parser.parse_args()
 
 
-if args.f:
-    execfile(args.f)
-
-#db = SqliteDatabase('sync.db')
-
-#class MTimes(Model):
-    #name = CharField(unique=True)
-    #mtime=IntegerField(default=0)
-
-    #class Meta:
-        #database = db # This model uses the "people.db" database.
-#db.connect()
-
-##db.create_tables([MTimes])
-
-
+def sync_with_config(conf):
+    #with open(conf) as f:
+    dc={}
+    execfile(conf, globals(), dc)
+    for entry in dc.get('entrys'):
+        s=CustomSync(entry)
+        s.run()
+      
 class CustomSync(SynCopy):
-
-    def should_incude_name(self,src,dst):
-        if src.endswith(ignore_files):
-            return False
-        elif not os.path.exists(dst):
+    def __init__(self, dc):
+        SynCopy.__init__(self,dc.get('src'),dc.get('dst'))
+        self.dc = dc
+        
+    def include_dir(self,src_dir):
+        if self.dc.get('include_dir'):
+            return self.dc.get('include_dir')(src_dir)
+        else:
             return True
-        elif int(getmtime(src))>int(getmtime(dst)):
-            return True
-
-    def write_to_db(self,src,dst):
-        tm=int(getmtime(dst))
-        f,c=MTimes.get_or_create(name=dst)        
-        f.mtime=tm
-        f.save()
     
+    def include_file(self,src,dst):
+        if not self.is_modify(src, dst):
+            return False
+        if self.dc.get('include_file'):
+            return self.dc.get('include_file')(src,dst)
+        else:
+            return True
+
 def main():
     print(datetime.now())
-    for src,dst in dirs:
-        s=CustomSync(src,dst)
-        s.run()
-        s=CustomSync(dst,src)
-        s.run()
-
+    if args.conf:
+        sync_with_config(args.conf)
+         
 
 if __name__=='__main__':
     main()
