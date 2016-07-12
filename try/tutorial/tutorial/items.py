@@ -22,6 +22,13 @@ class LinkItem(scrapy.Item):
     def __unicode__(self):
         return self.get('title') + '\t' + self.get('link')
 
+class HtmlBody(scrapy.Item):
+    url = scrapy.Field()
+    content = scrapy.Field()
+    
+class EmailItem(scrapy.Item):
+    email = scrapy.Field()
+    title = scrapy.Field()
 
 
 class ImgItem(scrapy.Item):

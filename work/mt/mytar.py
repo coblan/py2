@@ -61,6 +61,7 @@ def _tar_open(src,dest):
     tar.extractall(path=dest,)
 
 def _get_last_file(prefix):
+    """get newest tar file in the server"""
     new=''
     for f in os.listdir('.'):
         if f.startswith(prefix) and f.endswith('tar.gz') and f>new:

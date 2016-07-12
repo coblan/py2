@@ -4,23 +4,12 @@
 syn_copy(_from,_to,except_=None,except_name=func_copy) :
       见函数docstring
 """
-
+from __future__ import unicode_literals
 import sys,os
 from os.path import *
+import os
 import shutil
 from heStruct.heSignal import Signal
-
-#def sud_exclude(_from,_to):
-    #"""简便函数，用作copy的默认判断函数，能够判断修改时间的先后"""
-    #return exists(_to) and not int(getmtime(_from))>int(getmtime(_to))
-
-#def filter_not_modify(func):
-    #def _func(*args,**kw):
-        #if sud_exclude(*args,**kw) or func is None:
-            #return True
-        #else:
-            #return func(*args,**kw)
-    #return _func
 
 class SynCopy(object):
     def __init__(self,src,dst):
@@ -28,13 +17,14 @@ class SynCopy(object):
         self.src=src
         self.dst=dst
         
-    def should_include_dir(self,src_dir):
+    def include_dir(self,src_dir):
         """
+        @src_dir:
         overwrite  to  指定需要包含的 目录
         """
         return True
     
-    def should_incude_name(self,src,dst):
+    def include_file(self,src,dst):
         """
         overwrite to 指定需要包含的名字
         """
@@ -46,29 +36,46 @@ class SynCopy(object):
         if isfile(self.src):
             return self._syn_file(self.src, self.dst)
         else:
-            for root,dirs,files in walk(self.src,self.should_include_dir):
-                rel=relpath(root,self.src)
-                root_to=normpath(join(self.dst,rel))
-                if self.should_incude_name(root,root_to):
-                    self._mkdir_ifnot(root_to)
+            for root,dirs,files in os.walk(self.src):
+                dirs[:]=filter(self.include_dir,dirs)
+                
+                rel = os.path.relpath(root,self.src)
+                dst_root = os.path.join(self.dst,rel)
+                
+                dst_dir_paths = [os.path.join(dst_root,dir) for dir in dirs]
+                for path in dst_dir_paths:
+                    self._mkdir_if_not(path)
+                
+                src_files_paths = [os.path.join(root,file) for file in files]
+                dst_files_paths = [os.path.join(dst_root,file) for file in files]
+                
+                should_update_files = [(src,dst) for src,dst in zip(src_files_paths,dst_files_paths) if self.include_file(src,dst)]
+                
+                for src,dst in should_update_files:
+                    self._copy_file(src, dst)
+                    
+                
+                #root_to=normpath(join(self.dst,rel))
+                #if self.should_incude_name(root,root_to):
+                    #self._mkdir_ifnot(root_to)
   
-                for ii in dirs:
-                    drnm=normpath(join(root_to,ii))
-                    if self.should_incude_name(join(root,ii),drnm):
-                        self._mkdir_ifnot(drnm)
+                #for ii in dirs:
+                    #drnm=normpath(join(root_to,ii))
+                    #if self.should_incude_name(join(root,ii),drnm):
+                        #self._mkdir_ifnot(drnm)
          
-                for jj in files:
-                    flnm=normpath(join(root_to,jj))
-                    #if self.should_incude_name(join(root,jj),flnm):
-                    self._syn_file(join(root,jj), flnm)
+                #for jj in files:
+                    #flnm=normpath(join(root_to,jj))
+                    ##if self.should_incude_name(join(root,jj),flnm):
+                    #self._syn_file(join(root,jj), flnm)
         
-    def _mkdir_ifnot(self,path):
+    def _mkdir_if_not(self,path):
         if not exists(path):
-            os.mkdir(path)
+            os.makedirs(path)
             
-    def _syn_file(self,src,dst):
-        if not self.should_incude_name(src,dst):
-            return
+    def _copy_file(self,src,dst):
+        #if not self.should_incude_name(src,dst):
+            #return
         try:
             shutil.copyfile(src,dst)
             self.success_update.emit(src,dst)
@@ -81,95 +88,6 @@ class SynCopy(object):
     def is_modify(self,src,dst):
         return not exists(dst) or int(getmtime(src))>int(getmtime(dst))
     
-   
-    
-            
-#def syn_copy(_from,_to,except_=None,except_name=sud_exclude):
-    #"""同步拷贝。_from:样板目录；_to:修正目录；
-    #Args:
-    #@except:func(from_dir_name),传入_from中的目录名，return True时改目录不被处理，也就不会同步；
-    #@except_name:func(from_name,to_name),传入的from_name文件名或目录是肯定存在的，to_name是目标路径(当前不一定存在)
-                #return True 时，文件/目录不被拷贝，注意:如果是目录，其子孙文件同样会被处理,如果想不处理其子孙文件，
-                #可以在except参数指定的func中过滤掉改文件夹."""
-    #if not exists(_from):
-        #return
-    #elif isfile(_from):
-        #return syn_file(_from,_to)
-    
-    ##except_name=filter_not_modify(except_name)
-    
-    #for root,dirs,files in walk(_from,except_):
-        #rel=relpath(root,_from)
-        #root_to=normpath(join(_to,rel))
-        #if not except_name(root,root_to):
-            #try:
-                #os.mkdir(root_to)
-            #except:
-                #pass
-        #for ii in dirs:
-            #drnm=normpath(join(root_to,ii))
-            #if not except_name(join(root,ii),drnm):
-                #try:
-                    #os.mkdir(drnm)
-                    #print(u"创建文件夹:"+drnm)
-                #except:
-                    #pass
-        #for jj in files:
-            #flnm=normpath(join(root_to,jj))
-            #if not except_name(join(root,jj),flnm):
-                #try:
-                    #if exists(flnm):
-                        #os.remove(flnm)
-                    #shutil.copyfile(join(root,jj),flnm)
-                    #print(u"复制文件 :从"+join(root,jj)+u"到---->>>"+flnm)
-                #except Exception as e:
-                    #print(u"复制文件  %s错误, 错误为:%s"%(flnm,e))
-                    
-                    
-#def syn_file(_from,_to):
-    #if not sud_exclude(_from, _to):
-        #shutil.copyfile(_from,_to)
-        #print(u"复制文件 :从"+_from+u"到---->>>"+_to)
-
-
-#def delDir(dir_,except_=None,except_name=None):
-    #"""该函数用于删除某个目录
-    
-    #Args:
-    #@dir_:需要被删除的目录名
-    #@except_:func(dir_name)一个函数，接受目录名,return True，该目录名中所有文件都不会在删除列表中
-    #@except_name:fun(name)，函数，接受文件名或目录名,return True，该文件或目录确定不会被删除
-    
-    #用法，使用except_函数控制整个文件夹的删除与否。使用except_name控制单个文件的删除与否
-#"""
-    #del_dirs=[]
-    #del_files=[]
-    #for root,dirs,files in walk(dir_,except_):
-        #for ii in dirs:
-            #if not except_name or not except_name(join(root,ii)):
-                #del_dirs.append(join(root,ii))
-        #for jj in files:
-            #if not except_name or not except_name(join(root,jj)):
-                #del_files.append(join(root,jj))
-    #for ii in del_files:
-        #try:
-            #os.remove(ii)
-            #print(u"已经删除文件:"+ii)
-        #except Exception as e:
-            #print(u"删除文件 %s 错误,原因:%s"%(ii,e))
-    #del_dirs.sort(reverse=True)
-    #for jj in del_dirs:
-        #try:
-            #os.rmdir(jj)
-            #print(u"已经 删除文件夹:"+jj)
-        #except :
-            #pass
-    #try:
-        #os.rmdir(dir_)
-        #print(u"成功删除了文件夹: "+dir_)
-    #except:
-        #pass
-        ##print("删除文件夹 %s 错误 :%s"%(dir_,e))
 
 class SynDel(object):
     def __init__(self,src,dst):
@@ -184,9 +102,6 @@ class SynDel(object):
         return True
         
     def run(self):
-        #del_dirs=[]
-        #del_files=[]
-        
         print(u"正在整理目录"+" %s..X..%s"%(self.src,self.dst))
         if isfile(self.src) or isfile(self.dst):
             self.sync_del_file(self.src,self.dst)
@@ -204,22 +119,7 @@ class SynDel(object):
                     from_now=join(root_from,jj)
                     to_now=join(root,jj)
                     self.sync_del_file(from_now,to_now)
-                #if self.should_include_name(from_now,to_now) \
-                   #and not os.path.exists(from_now):
-                    #del_files.append(to_now)
-        #for ff in del_files:
-            #try:
-                #os.remove(ff)
-                #print(u"已经删除文件:"+ff)
-            #except Exception as e:
-                #print(u"删除  %s  出错 ,原因:%s"%(ff,e))
-    
-        #for dd in del_dirs:
-            #try:
-                #os.rmdir(dd)
-                #print(u"经常删除文件夹:"+dd)
-            #except:
-                #pass
+
         self.exec_del()
             
     def sync_del_file(self,src,dst):
@@ -286,8 +186,12 @@ def syn_del(src,dst,except_=None,except_name=None):
         except:
             pass
 
+def walk(idir,is_dir_include = None):
+    for i in os.walk(idir):
+        i[1][:]=filter(is_dir_include,i[1])
+        yield i
 
-def walk(dir_,include=None):
+def walk_old(dir_,include=None):
     """
     模拟python的标准walk函数，但是增加了过滤文件夹功能，如果不需要过滤文件夹，最好还是使用python的标准库吧
     
