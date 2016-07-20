@@ -56,6 +56,10 @@ USER_AGENT = "Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.36 (KHTML, lik
 #DOWNLOADER_MIDDLEWARES = {
 #    'tutorial.middlewares.MyCustomDownloaderMiddleware': 543,
 #}
+DOWNLOADER_MIDDLEWARES = {  
+    'scrapy.contrib.downloadermiddleware.useragent.UserAgentMiddleware' : None,  
+    'tutorial.middle.RotateUserAgentMiddleware' :100  
+}  
 
 # Enable or disable extensions
 # See http://scrapy.readthedocs.org/en/latest/topics/extensions.html
@@ -68,7 +72,7 @@ USER_AGENT = "Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.36 (KHTML, lik
 ITEM_PIPELINES = {
    'tutorial.pipelines.TutorialPipeline': 300,
 }
-
+DOWNLOAD_DELAY = 1
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See http://doc.scrapy.org/en/latest/topics/autothrottle.html
 # NOTE: AutoThrottle will honour the standard settings for concurrency and delay
