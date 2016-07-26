@@ -5,23 +5,35 @@ import scrapy
 from scrapy.spiders import CrawlSpider,Rule
 from scrapy.linkextractors import LinkExtractor
 from ..items import LinkItem,EmailItem,HtmlBody
+from bs4 import BeautifulSoup
 # import wingdbstub
+
+urls = []
+with open(u'd:/try/baidu.html','r') as f:
+    soup= BeautifulSoup( f.read() )
+    #for a in soup.select('tr a'):
+            #urls.append("https://www.baidu.com"+ a['href'] )    
+    for a in soup.select('h3 a'):
+        urls.append( a['href'] )
+    for a in soup.select('#page a'):
+        urls.append( "https://www.baidu.com"+a['href'] )
 
 class GpSearch(CrawlSpider):
     name='baidu'
     
     # allowed_domains =['mokitech.com']
     # start_urls=[r'https://www.baidu.com/s?wd=%E6%9C%88%E7%A7%91%E6%8A%80&rsv_spt=1&rsv_iqid=0xb3ed79f0001525c1&issp=1&f=8&rsv_bp=0&rsv_idx=2&ie=utf-8&tn=baiduhome_pg&rsv_enter=1&rsv_sug3=9&rsv_sug1=9&rsv_sug7=101&rsv_t=4793C5NsAf5aHgVjwst9Rb7oT5zfBEPnCr3r82r9F%2Bgv0PDCPugh%2BeBtI0kyp9lcuxGn&rsv_sug2=0&inputT=3717&rsv_sug4=8000']
-    
-    start_urls = [r'https://www.baidu.com/s?wd=月科技']
+    start_urls = urls
+    #start_urls = [r'https://www.baidu.com/s?wd=月科技']
     #start_urls =['http://www.cocloud.net/2013/09/10/scrapy_img_spider.html',]
     
     # start_urls=[r'https://www.google.com.hk/search?hl=en&q=月科技']
     
     rules=(
         # Rule(LinkExtractor(restrict_css='#navcnt'),follow=True),
-        Rule(LinkExtractor(restrict_css='#page'),follow=True),
-        Rule(LinkExtractor(restrict_css='h3'),callback='parse_item',follow=False)
+        #Rule(LinkExtractor(restrict_css='#page'),follow=True),
+        Rule(LinkExtractor(restrict_css='h3'),callback='parse_item',follow=True),
+        #Rule(LinkExtractor(deny_domains=('baidu.com')),callback='parse_item',follow=True)
         
     )
     #self.settings
