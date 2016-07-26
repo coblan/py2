@@ -53,9 +53,6 @@ def fast():
         run('touch {touch}'.format(touch=env.touch))
         
 
-# def fastdb():
-    # with cd('backup'):
-        # run('mysql  -uroot -proot {db} < {new_db}'.format(db=env.db,new_db=))
 
 def deploy():
     with cd(env.pro_path):
