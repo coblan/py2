@@ -11,9 +11,9 @@ class GpSearch(CrawlSpider):
     name='baidu'
     
     # allowed_domains =['mokitech.com']
-    start_urls=[r'https://www.baidu.com/s?wd=%E6%9C%88%E7%A7%91%E6%8A%80&rsv_spt=1&rsv_iqid=0xb3ed79f0001525c1&issp=1&f=8&rsv_bp=0&rsv_idx=2&ie=utf-8&tn=baiduhome_pg&rsv_enter=1&rsv_sug3=9&rsv_sug1=9&rsv_sug7=101&rsv_t=4793C5NsAf5aHgVjwst9Rb7oT5zfBEPnCr3r82r9F%2Bgv0PDCPugh%2BeBtI0kyp9lcuxGn&rsv_sug2=0&inputT=3717&rsv_sug4=8000']
+    # start_urls=[r'https://www.baidu.com/s?wd=%E6%9C%88%E7%A7%91%E6%8A%80&rsv_spt=1&rsv_iqid=0xb3ed79f0001525c1&issp=1&f=8&rsv_bp=0&rsv_idx=2&ie=utf-8&tn=baiduhome_pg&rsv_enter=1&rsv_sug3=9&rsv_sug1=9&rsv_sug7=101&rsv_t=4793C5NsAf5aHgVjwst9Rb7oT5zfBEPnCr3r82r9F%2Bgv0PDCPugh%2BeBtI0kyp9lcuxGn&rsv_sug2=0&inputT=3717&rsv_sug4=8000']
     
-    #start_urls = [r'https://www.baidu.com/s?ie=utf-8&f=8&rsv_bp=0&rsv_idx=1&tn=baidu&wd=%E6%9C%88%E7%A7%91%E6%8A%80&rsv_pq=a81514370000ec70&rsv_t=1cc4H7YnCOtNC5%2FEjW7%2BKT%2FZAMENQDbd8GyeahsogLxG%2FNGzUAtnMdGTFoM&rqlang=cn&rsv_enter=1&rsv_n=2&rsv_sug3=1']
+    start_urls = [r'https://www.baidu.com/s?wd=月科技']
     #start_urls =['http://www.cocloud.net/2013/09/10/scrapy_img_spider.html',]
     
     # start_urls=[r'https://www.google.com.hk/search?hl=en&q=月科技']
