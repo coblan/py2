@@ -54,21 +54,7 @@ class SynCopy(object):
                 for src,dst in should_update_files:
                     self._copy_file(src, dst)
                     
-                
-                #root_to=normpath(join(self.dst,rel))
-                #if self.should_incude_name(root,root_to):
-                    #self._mkdir_ifnot(root_to)
   
-                #for ii in dirs:
-                    #drnm=normpath(join(root_to,ii))
-                    #if self.should_incude_name(join(root,ii),drnm):
-                        #self._mkdir_ifnot(drnm)
-         
-                #for jj in files:
-                    #flnm=normpath(join(root_to,jj))
-                    ##if self.should_incude_name(join(root,jj),flnm):
-                    #self._syn_file(join(root,jj), flnm)
-        
     def _mkdir_if_not(self,path):
         if not exists(path):
             os.makedirs(path)
@@ -86,7 +72,7 @@ class SynCopy(object):
       
     
     def is_modify(self,src,dst):
-        return not exists(dst) or int(getmtime(src))>int(getmtime(dst))
+        return not exists(dst) or int(getmtime(src))-1 >int(getmtime(dst))
     
 
 class SynDel(object):
