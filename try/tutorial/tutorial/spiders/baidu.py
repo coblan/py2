@@ -9,16 +9,19 @@ from bs4 import BeautifulSoup
 # import wingdbstub
 
 urls = []
-with open(u'd:/try/baidu.html','r') as f:
-    soup= BeautifulSoup( f.read() )
-    #for a in soup.select('tr a'):
-            #urls.append("https://www.baidu.com"+ a['href'] )    
-    for a in soup.select('h3 a'):
-        urls.append( a['href'] )
-    for a in soup.select('#page a'):
-        urls.append( "https://www.baidu.com"+a['href'] )
+def load_url():
+    with open(u'd:/try/baidu.html','r') as f:
+        soup= BeautifulSoup( f.read() )
+        #for a in soup.select('tr a'):
+                #urls.append("https://www.baidu.com"+ a['href'] )    
+        for a in soup.select('h3 a'):
+            urls.append( a['href'] )
+        for a in soup.select('#page a'):
+            urls.append( "https://www.baidu.com"+a['href'] )
 
-class GpSearch(CrawlSpider):
+class BDSearch(CrawlSpider):
+    # load_url()
+    
     name='baidu'
     
     # allowed_domains =['mokitech.com']
