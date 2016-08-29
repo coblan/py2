@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+	<head>
+		<meta charset='utf-8' />
+		<script src="http://cdn.bootcss.com/jquery/1.11.3/jquery.min.js"></script>
+		<script src="http://cdn.bootcss.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+		<link rel="stylesheet" href="http://cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.min.css">
+		<script src="http://cdn.bootcss.com/vue/1.0.24/vue.js"></script>
+
+		<script type="text/javascript">
+		$(function () {
+			new Vue({
+				el:'body',
+				data:{
+					names:['one','two'],
+					dog_name:'haha',
+					dirs:[],
+					text:''
+				},
+				methods:{
+					hello:function () {
+						this.dirs = JSON.parse(dog.listdirs(this.dog_name))
+					},
+					init:function () {
+						this.dog_name=dog.name
+					},
+					open:function (dir) {
+						this.text = dog.open(this.dog_name+'/'+dir)
+					}
+				}
+			})
+		})
+			
+		</script>
+		<style type="text/css" media="screen" id="test">
+			.file{
+				cursor: pointer;
+			}
+			.file:hover{
+				color: blue;
+			}
+		</style>
+	</head>
+	<body>
+		<div>hello world</div>
+		<div v-for='name in names'><span v-text='name'></span></div>
+		<input type="text" v-model='dog_name'>
+		<button name="test" type="button" value="val" @click='init()'>Init</button>
+		<button name="test" type="button" value="val" @click='hello()'>say_name</button>
+
+		<div v-for='dir in dirs' v-text='dir' class='file' @click='open(dir)'></div>
+		<pre v-text='text'></pre>
+	</body>
+</html>
