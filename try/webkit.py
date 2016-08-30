@@ -6,6 +6,8 @@ from PyQt4.QtCore import QUrl,QObject,pyqtSlot, pyqtProperty
 from PyQt4.QtWebKit import QWebView
 import json
 
+from diff import get_table
+
 class Dog(QObject):
     def __init__(self, parent=None):
         super(Dog,self).__init__()
@@ -33,6 +35,10 @@ class Dog(QObject):
     def open(self,path):
         with open(path) as f:
             return f.read()
+    
+    @pyqtSlot(result=str)
+    def get(self):
+        return get_table()
     
 if __name__=='__main__':
     app = QApplication(sys.argv)

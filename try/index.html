@@ -16,7 +16,8 @@
 					names:['one','two'],
 					dog_name:'haha',
 					dirs:[],
-					text:''
+					text:'',
+					table:dog.get(),
 				},
 				methods:{
 					hello:function () {
@@ -28,7 +29,8 @@
 					open:function (dir) {
 						this.text = dog.open(this.dog_name+'/'+dir)
 					}
-				}
+				},
+				
 			})
 		})
 			
@@ -50,6 +52,7 @@
 		<button name="test" type="button" value="val" @click='hello()'>say_name</button>
 
 		<div v-for='dir in dirs' v-text='dir' class='file' @click='open(dir)'></div>
+		<div v-html='table'></div>
 		<pre v-text='text'></pre>
 	</body>
 </html>

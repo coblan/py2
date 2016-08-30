@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+	<head>
+		<meta charset='utf-8' />
+		<script src="http://cdn.bootcss.com/jquery/1.11.3/jquery.min.js"></script>
+		<script src="http://cdn.bootcss.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+		<link rel="stylesheet" href="http://cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.min.css">
+		<script src="http://cdn.bootcss.com/vue/1.0.24/vue.js"></script>
+
+		<script type="text/javascript">
+		//var qt={
+		//	get_files:function () {
+		//		return '[["D:\\\\try\\\\hellodj\\\\app.yaml", "D:\\\\try\\\\test\\\\.\\\\app.yaml"], ["D:\\\\try\\\\hellodj\\\\manage.py", "D:\\\\try\\\\test\\\\.\\\\manage.py"], ["D:\\\\try\\\\hellodj\\\\hellodj\\\\settings.py", "D:\\\\try\\\\test\\\\hellodj\\\\settings.py"], ["D:\\\\try\\\\hellodj\\\\hellodj\\\\urls.py", "D:\\\\try\\\\test\\\\hellodj\\\\urls.py"], ["D:\\\\try\\\\hellodj\\\\hellodj\\\\wsgi.py", "D:\\\\try\\\\test\\\\hellodj\\\\wsgi.py"], ["D:\\\\try\\\\hellodj\\\\hellodj\\\\__init__.py", "D:\\\\try\\\\test\\\\hellodj\\\\__init__.py"]]'
+
+		//	},
+		//	diff_file:function (src,dst) {
+		//		return ''
+		//	}
+		//}
+		$(function () {
+			new Vue({
+				el:'body',
+				data:{
+					files:JSON.parse(qt.get_files()),
+					crt_row:1,
+					diff:''
+				},
+				methods:{
+					click_row:function (index,pair) {
+						this.crt_row=index
+						this.diff=qt.diff_file(pair[0],pair[1])
+					},
+					hello:function () {
+						this.dirs = JSON.parse(dog.listdirs(this.dog_name))
+					},
+					init:function () {
+						this.dog_name=dog.name
+					},
+					open:function (dir) {
+						this.text = dog.open(this.dog_name+'/'+dir)
+					},
+					get_content:function () {
+						qt.content()
+					}
+				},
+				
+			})
+		})
+			
+		</script>
+		<style type="text/css" media="screen" id="test">
+			body{
+				background-color: #E1E1E1;
+			}
+			.dir-panel{
+				padding: 20px;
+				background-color: white;
+				border: 1px solid #999;
+				border-radius:5px;
+				width:20%;
+				display: inline-block;
+			}
+			.file{
+				cursor: pointer;
+			}
+			.file.active{
+				background-color: yellow;
+			}
+			.file:hover{
+				color: blue;
+			}
+			.diff{
+				width:75%;
+				display: inline-block;
+			}
+			.diff table{
+				background-color: white;
+				width:100%;
+			}
+		</style>
+	</head>
+	<body>
+		<div>hello world</div>
+		<button name="test" type="button" value="val" @click='get_content()'>Button Text</button>
+		<table class='dir-panel'>
+			<tr>
+				<td><a href='' @click=''>use old</a></td>
+				<td><a href='' @click=''>use new</a></td>
+			</tr>
+			<tr v-for='pair in files' @click='click_row($index,pair)' :class='[{"active":crt_row==$index},"file"]'>
+				<td v-for='target in pair' v-text='target'></td>
+			</tr>
+		</table>
+
+		<div class='diff' v-html='diff'>
+			
+		</div>
+	
+
+	</body>
+</html>

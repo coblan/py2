@@ -16,6 +16,9 @@ class SynCopy(object):
         self.success_update=Signal('src','dst')
         self.src=src
         self.dst=dst
+    
+    def process(self,src,dst):
+        self._copy_file(src, dst)   
         
     def include_dir(self,src_dir):
         """
@@ -52,13 +55,15 @@ class SynCopy(object):
                 should_update_files = [(src,dst) for src,dst in zip(src_files_paths,dst_files_paths) if self.include_file(src,dst)]
                 
                 for src,dst in should_update_files:
-                    self._copy_file(src, dst)
+                    self.process(src, dst)
                     
   
     def _mkdir_if_not(self,path):
         if not exists(path):
             os.makedirs(path)
-            
+    
+    
+        
     def _copy_file(self,src,dst):
         #if not self.should_incude_name(src,dst):
             #return
