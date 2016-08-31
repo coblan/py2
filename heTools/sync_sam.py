@@ -1,8 +1,10 @@
 # -*-encoding:utf-8 -*-
-a=[ur'D:\try\中文测试',ur'D:\try\test']
-b=[ur'D:\try\中文测试\simPage\admin.py',ur'D:\fuck.py']
-out=[a,b]
-print(out)
-dirs=out
 
-ignore_files=('.pyc',)
+import sync_code
+
+dc={
+    'dirs':[[ur'D:\try\中文测试',ur'D:\try\test'],],
+    'include_file':lambda src,dst: not src.endswith('.pyc')
+    }
+
+sync_code.sync(dc)
