@@ -4174,11 +4174,16 @@ http://wow.zamimg.com/images/hearthstone/cards/enus/animated/XXX_100_premium.gif
 """
 import os
 import re
+import sys
+sys.path.append(r'd:\coblan\py2')
+root = r'D:\work\zhouyan\image'
+length = len(os.listdir(root))
 ls = txt.split('\n')
-for url in ls:
+
+for url in ls[length:]:
     if url != '':
         rt = requests.get(url)
-        root = r'D:\work\zhouyan\image'
+        
         c = re.search('([^/]+)$',url)
         name = c.group(1)
         path = os.path.join(root,name)
