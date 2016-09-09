@@ -68,7 +68,7 @@ class SynCopy(object):
         #if not self.should_incude_name(src,dst):
             #return
         try:
-            shutil.copyfile(src,dst)
+            shutil.copy2(src,dst)
             self.success_update.emit(src,dst)
             print(u"复制文件 :从"+src+u"到---->>>"+dst)     
         except Exception as e:
@@ -77,7 +77,18 @@ class SynCopy(object):
       
     
     def is_modify(self,src,dst):
-        return not exists(dst) or int(getmtime(src))-1 >int(getmtime(dst))
+        return self.newer(src, dst)
+    
+    def newer(self,src,dst):
+        if not os.path.exists(dst):
+            return True
+        else:
+            return  int(getmtime(src))-1 >int(getmtime(dst))
+        
+    def content_eq(self,src,dst):
+        if os.path.exists(src) and os.path.exists(dst):
+            return open(src).read() == open(dst).read()
+        return False
     
 
 class SynDel(object):

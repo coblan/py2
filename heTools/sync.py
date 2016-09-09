@@ -7,7 +7,6 @@ import json
 import argparse
 from datetime import datetime
 import time
-#from peewee import *
 from os.path import getmtime
 import os.path
 
@@ -18,17 +17,25 @@ parser.add_argument('-c',"--conf", help="input config file ,json formate")
 args = parser.parse_args()
 
 
-def sync_with_config(conf):
-    #with open(conf) as f:
+def sync_with_config_file(conf):
     dc={}
     execfile(conf, globals(), dc)
-    for entry in dc.get('entrys'):
-        s=CustomSync(entry)
-        s.run()
-      
+    sync(dc)
+        
+
+def sync(dc):
+    """
+    dc={
+    'dirs':[(xxx,bbb),]
+    }
+    """
+    for src,dst in dc.get('dirs'):
+        s=CustomSync(src,dst)
+        s.run()    
+
 class CustomSync(SynCopy):
     def __init__(self, dc):
-        SynCopy.__init__(self,dc.get('src'),dc.get('dst'))
+        SynCopy.__init__(self,src,dst)
         self.dc = dc
         
     def include_dir(self,src_dir):
