@@ -4,6 +4,8 @@ from fabric.api import local, settings,lcd,env,cd,get,put
 from fabric.api import run
 import wingdbstub
 
+print('here')
+
 def first():
     env.hosts = ['coblan@enjoyst.com']
     env.passwords={'coblan@enjoyst.com:22':'he7125158'}

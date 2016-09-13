@@ -55,6 +55,7 @@ class Expect(QObject):
 if __name__ == '__main__':
     app =QApplication(sys.argv)
     exp = Expect()
+    
     os.chdir(r'D:\coblan\py2\heTools')
     #os.chdir(r'D:\coblan\py2\try')
     #exp.run(u'cmd /k dir')
