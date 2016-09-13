@@ -2,10 +2,13 @@
 
 from subprocess import Popen,PIPE
 
-p = Popen(u'dir',stdout=PIPE,shell=True)
-stdoutdata, stderrdata = p.communicate()
-print(stdoutdata.decode('gbk'))
-#for data in stdoutdata:
-    #print(data)
-#print(p.communicate())
-print('over')
+#p = Popen(u'dir',stdout=PIPE,shell=True)
+#stdoutdata, stderrdata = p.communicate()
+#print(stdoutdata.decode('gbk'))
+##for data in stdoutdata:
+    ##print(data)
+##print(p.communicate())
+#print('over')
+import os
+print(os.getcwd())
+Popen('fab tt',stdout=PIPE)

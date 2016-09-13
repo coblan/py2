@@ -59,4 +59,6 @@ def dj():
         local(r'D:\ve\first\Scripts\activate.bat')
         local(r'python manage.py runserver')
     
-        
+
+if __name__=='__main__':
+    tt()

@@ -1,6 +1,7 @@
 
 from fabric.api import local, settings,lcd,env,cd,get,put,prefix
 from fabric.api import run
+#import wingdbstub
 
 env.hosts = ['coblan@enjoyst.com']
 env.passwords={'coblan@enjoyst.com:22':'he7125158'}
@@ -18,7 +19,7 @@ def first():
         with cd('../run'):
             run('touch first.reload')
     
-import wingdbstub
+
 
 def push():
     with settings(warn_only=True):
