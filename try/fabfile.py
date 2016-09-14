@@ -2,7 +2,7 @@
 
 from fabric.api import local, settings,lcd,env,cd,get,put
 from fabric.api import run
-import wingdbstub
+# import wingdbstub
 
 def first():
     env.hosts = ['coblan@enjoyst.com']
@@ -41,6 +41,10 @@ def host_type():
         get(remote_path='/pypro/first/first/',local_path='D:/try/aliyun/first/%(dirname)s',use_sudo=True)
 
 
+def test_promp():
+    env.prompts={'show me':'heyulin'}
+    # with settings():
+    local('can_input.py')
 
 def put_python():
     put('mytar.py','mytar.py')

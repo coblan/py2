@@ -1,3 +1,8 @@
-import requests
-rt = requests.get('http://stash.stm.com/plugins/servlet/archive/projects/CMP/repos/apppagegenerator?at=refs%2Fheads%2Fmaster')
-print(rt.content)
+from subprocess import Popen,PIPE
+import os
+os.chdir(r'D:\coblan\web\first')
+p = Popen('git status',shell=True,stdout=PIPE)
+
+while p.
+info,err = p.communicate()
+print(info.decode('gbk'))
