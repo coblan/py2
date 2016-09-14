@@ -11,4 +11,8 @@ from subprocess import Popen,PIPE
 #print('over')
 import os
 print(os.getcwd())
-Popen('fab tt',stdout=PIPE)
+p =Popen('fab tt',stdout=PIPE,stdin=PIPE)
+# while p.poll():
+stdoutdata, stderrdata = p.communicate()
+print(stdoutdata)
+
