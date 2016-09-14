@@ -1,7 +1,7 @@
 
 from fabric.api import local, settings,lcd,env,cd,get,put,prefix
 from fabric.api import run
-import wingdbstub
+# import wingdbstub
 
 print('into herer')
 
