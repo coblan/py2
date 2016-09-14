@@ -1,8 +1,14 @@
-from selenium import webdriver
+# encoding:utf-8
 
-#browser = webdriver.Chrome()
-browser = webdriver.Firefox()
-browser.get('http://www.google.com/')
+from subprocess import Popen,PIPE
 
-print(browser.get_cookies())
-input('ss')
+#p = Popen(u'dir',stdout=PIPE,shell=True)
+#stdoutdata, stderrdata = p.communicate()
+#print(stdoutdata.decode('gbk'))
+##for data in stdoutdata:
+    ##print(data)
+##print(p.communicate())
+#print('over')
+import os
+print(os.getcwd())
+Popen('fab tt',stdout=PIPE)
