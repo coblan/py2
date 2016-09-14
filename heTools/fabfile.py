@@ -7,6 +7,7 @@ print('into herer')
 
 env.hosts = ['coblan@enjoyst.com']
 env.passwords={'coblan@enjoyst.com:22':'he7125158'}
+env.always_use_pty =False
 
 def first():
     with lcd(r'D:\coblan\web\first'):

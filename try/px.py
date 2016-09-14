@@ -26,7 +26,7 @@ import os
 os.chdir(r'D:\coblan\py2\heTools')
 child.sendline('cd D:\coblan\py2\heTools')
 child.sendline('fab push')
-child.expect("Username for 'https://git.oschina.net':")
+child.expect(r"https://git.oschina.net':")
 child.sendline('coblan@163.com')
 
 #child.expect('>')
