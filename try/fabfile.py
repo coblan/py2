@@ -56,9 +56,13 @@ def put_python():
 def tt():
     aa=raw_input('show me')
     print('hello %s'%aa)
-    
+
+
+
 def hello():
     print("Hello world!")
+    with settings(prompts={"show me": 'coblan@163.com',} ):
+        local('python can_input.py')
 
 def dj():
     with lcd(r'D:\coblan\web\first'):

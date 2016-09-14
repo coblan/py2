@@ -21,10 +21,11 @@ def first():
         with cd('../run'):
             run('touch first.reload')
     
-
+env.prompts={"https://git.oschina.net': ": 'coblan@163.com',}
 
 def push():
-    with settings(warn_only=True):
+    # warn_only=True,prompts={"https://git.oschina.net':": 'coblan@163.com\n'}
+    with settings():
         with lcd(r'D:\coblan\web\first'):
             print('start push first')
             _auto_push()
