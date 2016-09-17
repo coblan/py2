@@ -45,6 +45,9 @@ def sync(dc):
             if i in s.warn_files:
                 ls.append(i)
         for x, y in ls:
+            # if file was found bouth in target.warn_file and src.warn_file, then means stamp file left behind src and dst file.
+            # this is a kind of conflict because the same file has been modified in two side without sync.
+            
             print('[warning] %s----conflict-----%s'%( x,y))
         
         if not ls:
@@ -74,7 +77,7 @@ class RepToApp(SynCopy):
             if self.dc.get('include_file')(src,dst):
                 if self.newer_than_stamp(dst):
                     if not self.content_eq(src,dst):  # when resolve conflict ,this express will make process skiping push_file
-                        self.push_file(os.path.normpath( src),os.path.normpath( dst) )      # so, make stamp update
+                        self.record_modified_file(os.path.normpath( src),os.path.normpath( dst) )      # so, make stamp update
                     return False
 
                 if self.newer(src, dst):
@@ -84,7 +87,7 @@ class RepToApp(SynCopy):
 
     
     
-    def push_file(self,src,dst):
+    def record_modified_file(self,src,dst):
         self.warn_files.append((src,dst))
     
     def newer_than_stamp(self, path):
@@ -106,7 +109,7 @@ class AppToRep(RepToApp):
         super(AppToRep,self).__init__(src, dst, dc)
         self.stamp_path = os.path.join(src,'stmp.txt')
     
-    def push_file(self,src,dst):
+    def record_modified_file(self,src,dst):
         self.warn_files.append((dst,src))
         
 def main():
