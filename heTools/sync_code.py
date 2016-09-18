@@ -45,7 +45,7 @@ def sync(dc):
             if i in s.warn_files:
                 ls.append(i)
         for x, y in ls:
-            # if file was found bouth in target.warn_file and src.warn_file, then means stamp file left behind src and dst file.
+            # if file was found both in target.warn_file and src.warn_file, that means stamp file left behind src and dst file.
             # this is a kind of conflict because the same file has been modified in two side without sync.
             
             print('[warning] %s----conflict-----%s'%( x,y))
