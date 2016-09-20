@@ -1,4 +1,4 @@
-import qteven
+import heQt.qteven
 import sys
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -12,15 +12,21 @@ class Expect(QObject):
         self.task = []
         self.proc =None
         self.update_proc()
-
+        #self.startTimer(1000)
     
+    #def timerEvent(self,evet):
+        #self.stdout()
+        #print('timer')
+        
     def update_proc(self):
         #if self.proc:
             #self.proc.setParent(None)
         self.proc = QProcess(self)
+        self.proc.setProcessChannelMode(QProcess.ForwardedChannels)
+        self.proc.setOpenMode(QProcess.ReadWrite| QProcess.Unbuffered)
         self.proc.readyReadStandardOutput.connect(self.stdout)
         self.proc.started.connect(self.stdout)
-        self.proc.error.connect(self.stdout)
+        self.proc.error.connect(self.on_error)
         self.proc.finished.connect(self.on_finish)
         self.proc.stateChanged.connect(self.fetch_task)
         self.proc.started.connect(self.on_start)        
@@ -46,6 +52,9 @@ class Expect(QObject):
         if string.find("Password for 'https://coblan@163.com@git.oschina.net'")!=-1:
             self.proc.write('he7125158')
     
+    def on_error(self):
+        print('has error')
+    
     def on_finish(self):
         print('finished ...')
     
@@ -56,12 +65,12 @@ if __name__ == '__main__':
     app =QApplication(sys.argv)
     exp = Expect()
     
-    os.chdir(r'D:\coblan\py2\heTools')
-    #os.chdir(r'D:\coblan\py2\try')
+    #os.chdir(r'D:\coblan\py2\heTools')
+    #os.chdir(r'D:\coblan\web\first')
     #exp.run(u'cmd /k dir')
    
-    #exp.proc.start('cmd /c dir')
-    exp.proc.start('fab push')
+    exp.proc.start('cmd /k ff.cmd')
+    #exp.proc.start('fab push')
     #exp.proc.start('fab tt')
     #exp.run(u'python fabfile.py')
     sys.exit(app.exec_())
