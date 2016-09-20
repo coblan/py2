@@ -5,12 +5,12 @@ Created on 2016-08-18
 @author: jingyang <jingyang@nexa-corp.com>
 
 Usage:
-    fab staging deploy
-    fab prod deploy
+    fab staging add_bundle
+    fab staging download
 '''
 from fabric.api import local
 from fabric.context_managers import lcd, cd,prefix
-from fabric.operations import put, run
+from fabric.operations import put, run, get
 from fabric.state import env
 
 
@@ -83,3 +83,15 @@ def add_bundle():
 def test():
     with prefix(env.active):
         run('pip freeze')
+
+
+def download():
+    with cd('/data/project/wallpaperv3/data'):
+        run('mv user_image ready_download')
+        run('mkdir user_image')
+        run('tar -zcvf user_uploaded.tar.gz ready_download')
+        # run('zip -r user_uploaded.zip ready_download')
+        
+        get(remote_path='user_uploaded.tar.gz',local_path='D:/')
+        run('rm user_uploaded.tar.gz')
+        run('rm -R ready_download')
