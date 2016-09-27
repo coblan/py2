@@ -28,20 +28,24 @@ def push():
     # warn_only=True,prompts={"https://git.oschina.net':": 'coblan@163.com\n'}
     with settings():
         with lcd(r'D:\coblan\web\first'):
-            print('[start] push first')
+            print('[start] ========push first')
             _auto_push()
+            print('[success] push first')
         
         with lcd(r'D:\coblan\py2'):
-            print('[start] push py2')
+            print('[start]========= push py2')
             _auto_push()
+            print('[success] push py2')
         
         with lcd(r'D:\coblan\webcode'):
-            print('[start] push webcode')
+            print('[start]======= push webcode')
             _auto_push()
+            print('[success] push webcode')
         
         with lcd(r'D:\coblan\web\insight'):
-            print('[start] push insight')
-            _auto_push()        
+            print('[start]======= push insight')
+            _auto_push() 
+            print('[success] push insight')
 
 def _auto_push():
     rt = local('git status',capture=True)
