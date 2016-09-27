@@ -52,7 +52,7 @@ def _auto_push():
     if not rt.stdout.endswith('nothing to commit, working directory clean'):
         local('git add .',capture=True)
         local('git commit -m "auto commit"',capture=True)
-        local('git push')
+    local('git push')
 
 def pull():
     ls=[r'D:\coblan\web\first',
