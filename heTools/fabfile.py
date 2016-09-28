@@ -9,6 +9,8 @@ env.hosts = ['coblan@enjoyst.com']
 env.passwords={'coblan@enjoyst.com:22':'he7125158'}
 env.always_use_pty =False
 
+#env.key_filename =r'D:\home\.ssh\id_rsa'
+
 def first():
     with lcd(r'D:\coblan\web\first'):
         with prefix(r'D:\ve\first\Scripts\activate.bat'):
@@ -55,12 +57,13 @@ def _auto_push():
     local('git push')
 
 def pull():
-    ls=[r'D:\coblan\web\first',
-        r'D:\coblan\py2',
-        r'D:\coblan\webcode',
-        r'D:\coblan\web\insight']
+    ls=[r'/cygdrive/d/coblan/web/first',
+        r'/cygdrive/d/coblan/py2',
+        r'/cygdrive/d/coblan/webcode',
+        r'/cygdrive/d/coblan/web/insight']
     for path in ls:
         with lcd(path):
+            print('==='+path)
             local('git pull')
 
     
