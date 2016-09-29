@@ -32,6 +32,8 @@ def sync(dc):
     }
     """
     for src,dst in dc.get('dirs'):
+        print('='*20)
+        print('[start] :{src} to {dst} sync'.format(src=src,dst=dst))
         s=RepToApp(src,dst,dc)
         s.read_stamp()
         s.run()
@@ -53,6 +55,8 @@ def sync(dc):
         if not ls:
             t.update_stamp()
             print('no warning')
+        
+    
 
 
 
