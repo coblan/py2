@@ -32,47 +32,63 @@ def prod():
     env.active='source /data/project/wallpaperv3/venv/bin/activate'    
 
 
-tags="""TV Shows
-Patterns
-Sports
-Space
-Soccer
-Pink
-Quotes
-Singers
-Nature
-Movies
-Motivational
-Monogram
-Love
-Landscapes
-Illustrations
-Girls
-Games
-Funny
-Food
-Flowers
-Fashion
-Dogs
-Cute
-Colors
-Celebrities
-Cats
-Cartoons
-Cars
-Calendars
-Brands
-Black and White
-Basketball
-Art
-Anime
-Animals
+# tags="""TV Shows
+# Patterns
+# Sports
+# Space
+# Cars
+# Calendars
+# Brands
+# Black and White
+# Basketball
+# Art
+# Anime
+# Animals
+# Actresses
+# Actors"""
+tags="""Cartoon
 Actresses
-Actors"""
+Actors
+Monogram
+Colorful
+Anime
+Cats
+Singers
+Flowers
+Funny
+Fashion
+Animals
+Cute
+Girls
+Love
+Pattern
+Dogs
+Quotes
+Pink
+Blue
+Purple
+Winter
+Summer
+Spring
+Autumn
+Marvel
+Galaxy
+Food
+Illustrations
+Motivational
+Movies
+TV Shows
+Landscape"""
+
+# bundle_id='com.ticktockapps.iphone7-wallhd-10000'
+# bundle_id='com.wallpapershdinc.pinkwallpapers-wallhd'
+bundle_id='com.ticktockapps.android_girlywallpapers'
+
 tags=[tag for tag in tags.split('\n') if tag!='']
 tags=','.join(tags)
-bundle_id='com.ticktockapps.iphone7-wallhd-10000'
-size='1080x1920'
+
+# size='1080x1920'
+size='1080x1920,2048x2048'
 
 def add_bundle():
     with cd(PROJECT_DIR):
@@ -89,9 +105,11 @@ def download():
     with cd('/data/project/wallpaperv3/data'):
         run('mv user_image ready_download')
         run('mkdir user_image')
+        run('chmod -R 777 user_image')
         run('tar -zcvf user_uploaded.tar.gz ready_download')
         # run('zip -r user_uploaded.zip ready_download')
         
         get(remote_path='user_uploaded.tar.gz',local_path='D:/')
         run('rm user_uploaded.tar.gz')
         run('rm -R ready_download')
+        
