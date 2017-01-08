@@ -1,7 +1,7 @@
 import zipfile
 import os
 
-idir = 'trypkg'
+idir = 'D:\coblan\py2\heQt'
 with zipfile.ZipFile('trypkg.zip' ,'w') as izip:
     for r,ds,fs in os.walk(idir):
         for f in fs:

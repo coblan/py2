@@ -2,30 +2,45 @@
 
 from fabric.api import local, settings,lcd,env,cd,get,put
 from fabric.api import run
+import time
 # import wingdbstub
 
 print('here')
 
+def xiche():
+     #with settings(prompts={" Login password for 'root': ": 'Zhaozijian@123',} ):
+     env.hosts = ['root@api.uacar.cn']
+     env.passwords={
+          'root@api.uacar.cn:22': 'Zhaozijian@123',
+}
+
+def backmysql():
+    #with settings(prompts={"Login password for 'root': ": 'Zhaozijian@123',} ): 
+     run('ls')
+     run('mysqldump -u root -p123456789 xiche>xiche_{stamp}.sql'.format(stamp= int(time.time())) )
+     run('ls')
+
+
 def first():
-    env.hosts = ['coblan@enjoyst.com']
-    env.passwords={'coblan@enjoyst.com:22':'he7125158'}
+     env.hosts = ['coblan@enjoyst.com']
+     env.passwords={'coblan@enjoyst.com:22':'he7125158'}
 
 
 def deploy():
-    run('ls -al')
+     run('ls -al')
 
 def prepare_deploy():
     #local("dir")
-    with settings(warn_only=True):
-        #tt()
-        modify()
-        env.passwords={'dsg':'sdgdsg'}
-        print(env.hosts)
-        print(env.passwords)
-        run('ls -al')
-    print(env.hosts)
-    print(env.passwords)
-    run('ls -al')
+     with settings(warn_only=True):
+          #tt()
+          modify()
+          env.passwords={'dsg':'sdgdsg'}
+          print(env.hosts)
+          print(env.passwords)
+          run('ls -al')
+     print(env.hosts)
+     print(env.passwords)
+     run('ls -al')
         #with lcd(r'D:\coblan\webcode'):
             #local('git add .',capture=True)
             ##rt2=local('git commit -m "test fabric"')
@@ -34,41 +49,41 @@ def prepare_deploy():
     #print(rt.stderr )
 
 def modify():
-    env.hosts=['dog@dog.om']
+     env.hosts=['dog@dog.om']
 
 def host_type():
-    with cd('/pypro/first/'):
-        run('uname -s')
-        run('ls')
-        get(remote_path='/pypro/first/first/',local_path='D:/try/aliyun/first/%(dirname)s',use_sudo=True)
+     with cd('/pypro/first/'):
+          run('uname -s')
+          run('ls')
+          get(remote_path='/pypro/first/first/',local_path='D:/try/aliyun/first/%(dirname)s',use_sudo=True)
 
 
 def test_promp():
-    env.prompts={'show me':'heyulin'}
-    # with settings():
-    local('can_input.py')
+     env.prompts={'show me':'heyulin'}
+     # with settings():
+     local('can_input.py')
 
 def put_python():
-    put('mytar.py','mytar.py')
-    run('python mytar.py /pypro/first/first/')
-    get(remote_path='your.tar.gz',local_path='D:/try/aliyun/')
+     put('mytar.py','mytar.py')
+     run('python mytar.py /pypro/first/first/')
+     get(remote_path='your.tar.gz',local_path='D:/try/aliyun/')
 
 def tt():
-    aa=raw_input('show me')
-    print('hello %s'%aa)
+     aa=raw_input('show me')
+     print('hello %s'%aa)
 
 
 
 def hello():
-    print("Hello world!")
-    with settings(prompts={"show me": 'coblan@163.com',} ):
-        local('python can_input.py')
+     print("Hello world!")
+     with settings(prompts={"show me": 'coblan@163.com',} ):
+          local('python can_input.py')
 
 def dj():
-    with lcd(r'D:\coblan\web\first'):
-        local(r'D:\ve\first\Scripts\activate.bat')
-        local(r'python manage.py runserver')
+     with lcd(r'D:\coblan\web\first'):
+          local(r'D:\ve\first\Scripts\activate.bat')
+          local(r'python manage.py runserver')
     
 
 if __name__=='__main__':
-    tt()
+     tt()
