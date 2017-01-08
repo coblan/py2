@@ -2,9 +2,17 @@
 
 from fabric.api import local, settings,lcd,env,cd,get,put
 from fabric.api import run
+import time
 # import wingdbstub
 
 print('here')
+
+def xiche():
+    env.hosts = ['root@api.uacar.cn']
+
+def backmysql():
+    #with settings(prompts={"Login password for 'root': ": 'Zhaozijian@123',} ): 
+    run('mysqldump -u root -p xiche>xiche_{stamp}.sql'.format(stamp=time.time()))
 
 def first():
     env.hosts = ['coblan@enjoyst.com']
