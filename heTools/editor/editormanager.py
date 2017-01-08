@@ -1,4 +1,5 @@
 # -*- encoding:utf8 -*-
+from heQt.qteven import *
 from PyQt4.QtGui import QTabWidget,QStandardItemModel
 from PyQt4.QtCore import QFileInfo,pyqtSignal
 from heStruct.heSignal import connect,fire
