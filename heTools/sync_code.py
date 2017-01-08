@@ -1,6 +1,7 @@
 # -*- encoding:Utf-8 -*-
 #import wingdbstub
 from heOs.syndir import SynCopy,SynDel
+
 import sys
 import json
 
@@ -10,6 +11,7 @@ import time
 from os.path import getmtime
 import os.path
 
+
 parser = argparse.ArgumentParser() 
 parser.add_argument("-s", help="source dir") 
 parser.add_argument("-d", help="dest dir") 
@@ -17,10 +19,10 @@ parser.add_argument('-c',"--conf", help="input config file ,json formate")
 args = parser.parse_args()
 
 
-def sync_with_config_file(conf):
-    dc={}
-    execfile(conf, globals(), dc)
-    sync(dc)
+#def sync_with_config_file(conf):
+    #dc={}
+    #execfile(conf, globals(), dc)
+    #sync(dc)
         
 
 def sync(dc):
@@ -32,8 +34,11 @@ def sync(dc):
     }
     """
     for src,dst in dc.get('dirs'):
-        print('='*20)
-        print('[start] :{src} to {dst} sync'.format(src=src,dst=dst))
+        last_stamp=read_stamp(dst)
+        
+        del_proc = RepSrcDelApp(last_stamp,src,dst)
+        del_proc.run()
+        
         s=RepToApp(src,dst,dc)
         s.read_stamp()
         s.run()
@@ -55,10 +60,31 @@ def sync(dc):
         if not ls:
             t.update_stamp()
             print('no warning')
+
+def read_stamp(dst):
+    dst_path = os.path.join(dst,'stmp.txt')
+    if os.path.exists(dst_path):
+        return datetime.strptime( open(dst_path,'r').read(),'%Y-%m-%d %H:%M:%S')
+    else:
+        return datetime.fromtimestamp(0)
+
+class RepSrcDelApp(SynDel):
+    """
+    将 reposit 中不存在的目录，从application中删除。
+    * 如果目录或者文件的修改日期是在stamp之后，说明它们是新建的，无论如何不能动，所以，这些被删除的目录，必须满足：修改日期在stamp之前。
+    """
+    def __init__(self,stamp,src,dst):
+        super(RepSrcDelApp,self).__init__(src,dst)
+        self.stamp=stamp
         
+    def aware_dir_name(self,root,dst_dir_name):
+        dst_path=os.path.join(root,dst_dir_name)
+        mtime = datetime.fromtimestamp( os.path.getmtime(dst_path))
+        return mtime < self.stamp
     
-
-
+    def aware_file_name(self,src_file_path,dst_file_path):
+        mtime = datetime.fromtimestamp( os.path.getmtime(dst_file_path))
+        return mtime < self.stamp
 
 class RepToApp(SynCopy):
     def __init__(self, src,dst,dc):
