@@ -1,18 +1,13 @@
 # encoding:utf-8
 
-from subprocess import Popen,PIPE
+import time
 
-#p = Popen(u'dir',stdout=PIPE,shell=True)
-#stdoutdata, stderrdata = p.communicate()
-#print(stdoutdata.decode('gbk'))
-##for data in stdoutdata:
-    ##print(data)
-##print(p.communicate())
-#print('over')
-import os
-print(os.getcwd())
-p =Popen('fab tt',stdout=PIPE,stdin=PIPE)
-# while p.poll():
-stdoutdata, stderrdata = p.communicate()
-print(stdoutdata)
+print('hello')
 
+cnt=1
+while True:
+    time.sleep(2)
+    cnt+=1
+    # if cnt>10:
+        # break
+    print(cnt)
