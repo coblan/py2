@@ -58,7 +58,7 @@ def push_item(item):
     print('[push] %s'%item.get('path'))
     print('='*20)
     with lcd(item.get('path')):
-        status=local('git status',capture=True)
+        status = local('git status',capture=True)
         print(status)
         if re.search('nothing to commit',status,re.S):
             return
