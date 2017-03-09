@@ -15,9 +15,9 @@ from fabric.state import env
 import re
 
 
-import sys
-sys.path.append('D:\coblan\py2')
-import wingdbstub
+#import sys
+#sys.path.append('D:\coblan\py2')
+#import wingdbstub
 
 PROJECT_NAME = "wallpaperv3"
 PROJECT_DIR = "/data/project/wallpaperv3/"  # project dir on server
