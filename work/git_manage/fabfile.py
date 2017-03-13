@@ -61,12 +61,14 @@ def pull_item(item):
             with lcd('src/helpers'):
                 local('git pull')
 
-
-def spush():
-    """safe push"""
-    push()
-    pull()
-    push()
+"""
+helpers起作用的是pull，不是update，不管是否更新 submodule的指针，在下次fab pull时，都会使helpers指向最新。所以没有必要，在push时，让所有库的helpers指针指向最新。
+"""
+#def spush():
+    #"""safe push"""
+    #push()
+    #pull()
+    #push()
 
 def push():
     if env.get('target'):
