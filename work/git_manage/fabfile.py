@@ -38,6 +38,7 @@ def insight():
 def xiche():
     env['target']={'path':r'D:\work\xiche','with_helpers':True}
 
+
 def pull():
     if env.get('target'):
         pull_item(env.get('target'))
@@ -60,6 +61,12 @@ def pull_item(item):
             with lcd('src/helpers'):
                 local('git pull')
 
+
+def spush():
+    """safe push"""
+    push()
+    pull()
+    push()
 
 def push():
     if env.get('target'):
