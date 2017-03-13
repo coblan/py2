@@ -2,7 +2,7 @@
 '''
 Created on 2016-08-18
 
-@author: jingyang <jingyang@nexa-corp.com>
+@author: heyulin <heyulin@smalltreemedia.com>
 
 Usage:
     fab staging add_bundle

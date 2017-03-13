@@ -19,6 +19,8 @@ import re
 #sys.path.append('D:\coblan\py2')
 #import wingdbstub
 
+
+
 PROJECT_NAME = "wallpaperv3"
 PROJECT_DIR = "/data/project/wallpaperv3/"  # project dir on server
 
@@ -26,13 +28,23 @@ reposits=[
     {'path':r'D:\coblan\web\insight','with_helpers':True},
     {'path':r'D:\coblan\web\first','with_helpers':True},
     {'path':r'D:\coblan\webcode','with_helpers':False},
-    {'path':r'D:\coblan\py2','with_helpers':False}
+    {'path':r'D:\coblan\py2','with_helpers':False},
+    {'path':r'D:\work\xiche','with_helpers':True}
 ]
 
+def insight():
+    env['target']={'path':r'D:\coblan\web\insight','with_helpers':True}
+
+def xiche():
+    env['target']={'path':r'D:\work\xiche','with_helpers':True}
+
 def pull():
-    for repo in reposits:
-        pull_item(repo)
-        
+    if env.get('target'):
+        pull_item(env.get('target'))
+    else:
+        for repo in reposits:
+            pull_item(repo)
+            
 def pull_item(item):
     print('')
     print('start pull %s'%item.get('path'))
@@ -50,8 +62,11 @@ def pull_item(item):
 
 
 def push():
-    for repo in reposits:
-        push_item(repo)
+    if env.get('target'):
+        push_item(env.get('target'))  
+    else:
+        for repo in reposits:
+            push_item(repo)
 
 def push_item(item):
     print('')
