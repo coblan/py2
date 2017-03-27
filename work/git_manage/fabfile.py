@@ -30,7 +30,7 @@ reposits=[
     {'path':r'D:\coblan\webcode','with_helpers':False},
     {'path':r'D:\coblan\py2','with_helpers':False},
     {'path':r'D:\coblan\py3','with_helpers':False},
-    {'path':r'D:\work\xiche','with_helpers':True}
+    #{'path':r'D:\work\xiche','with_helpers':True}
 ]
 
 def insight():
