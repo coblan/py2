@@ -1,6 +1,7 @@
 from __future__ import division
 from fp_growth import find_frequent_itemsets
-
+from getRelatedRule import getRelatedRules
+import getRelatedRule
 
 def loadSimpDat():
     simpDat = [['r', 'z', 'h', 'j', 'p'],
@@ -8,37 +9,56 @@ def loadSimpDat():
                ['z'],
                ['r', 'x', 'n', 'o', 's'],
                ['y', 'r', 'x', 'z', 'q', 't', 'p'],
-               ['y', 'z', 'x', 'e', 'q', 's', 't', 'm']]
+               ['y', 'z', 'x', 'e', 'q', 's', 't', 'm'],
+               ['y', 'z', 'x', 'e', 'q', 's', 't', 'm'],
+               ['y', 'z', 'x', 'e', 'q', 's', 't', 'm'],
+               ['y', 'z', 'x', 'e', 'q', 's', 't', 'm'],
+               ['y', 'z', 'x', 'e', 'q', 's', 't', 'm'],
+               ['y', 'z', 'x', 'e', 'q', 's', 't', 'm'],
+               ['y', 'z', 'x', 'e', 'q', 's', 't', 'm'],]
     return simpDat
 
-freq=[]
+data2=[[1,3,4],
+       [2,3,5],
+       [1,2,3,5],
+       [2,5]]
 
-for itemset in find_frequent_itemsets(loadSimpDat(),3):
-    freq.append(sorted(itemset))
+
+
+
+freq=[]
+supportData={}
+
+for itemset,conf in find_frequent_itemsets(loadSimpDat(),4, include_support=True):
+    freq.append(frozenset(itemset))
+    supportData[frozenset(itemset)]=conf*1.0
+
+freq = sorted(freq,key=lambda x:len(x))
+
+
+L=[]
+crt = 0
+for item in freq:
+    if len(item) > crt:
+        crt=len(item)
+        tmp=[]
+        L.append(tmp)
+    tmp.append(item)
+
+    
+        
+for k in freq:
+    print(k,'conf:',supportData[k])
+    
+print('-'*30)
+
+for k in L:
+    print(k)
 
 print('-'*30)
 
-def get_co(single_item):
-    has_item_set = filter(lambda x:single_item in x,freq)
-    all_ele=frozenset(reduce(lambda x,y:x+y,has_item_set))
-    sup_item=len(has_item_set)/len(freq)
-    
-    for sub_set in get_sub_set(single_item,all_ele):
-        print(sub_set)
-        
 
-def get_sub_set(ele,all_ele):
-    for sub_set in power_set(all_ele):
-        if ele in sub_set:
-            yield sub_set
+rules = getRelatedRules(L, supportData,minConf=0.5)
 
-def get_sup(sub_set,comp_set_list):
-    count=0
-    for com_set in comp_set_list:
-        if sub_set.issubset(com_set):
-            count+=1
-    return count
 
-        
-get_co('x')
 
