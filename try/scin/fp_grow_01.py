@@ -1,3 +1,6 @@
+# encoding:utf-8
+
+from __future__ import unicode_literals
 from __future__ import division
 from fp_growth import find_frequent_itemsets
 from getRelatedRule import getRelatedRules
@@ -35,6 +38,10 @@ for itemset,conf in find_frequent_itemsets(loadSimpDat(),4, include_support=True
 
 freq = sorted(freq,key=lambda x:len(x))
 
+"""
+freq=[{a,b},{b,c}]
+supportData={{a,b}:1.0,{b,c}:0.5}
+"""
 
 L=[]
 crt = 0
@@ -45,7 +52,11 @@ for item in freq:
         L.append(tmp)
     tmp.append(item)
 
-    
+"""
+# L是经过“按照元素个数”group后的集合列表
+L=[[{a},{b}],
+   [{a,b}]]
+"""
         
 for k in freq:
     print(k,'conf:',supportData[k])
