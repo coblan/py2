@@ -20,6 +20,7 @@ class TestHTTPHandler(BaseHTTPRequestHandler):
         args=dict(urlparse.parse_qsl(o.query))
         if self.path=='/file':
             self.wfile.write(self.path)
+            
     
     def do_POST(self):
         buf = 'It works'
