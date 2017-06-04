@@ -1,13 +1,14 @@
 # encoding:utf-8
 
-import time
+class A(object):
+    name='pig'
+    @staticmethod
+    def fuck():
+        name='dog'
+        
+    @staticmethod
+    def say():
+        print(name)
 
-print('hello')
-
-cnt=1
-while True:
-    time.sleep(2)
-    cnt+=1
-    # if cnt>10:
-        # break
-    print(cnt)
+b=A()
+b.say()
