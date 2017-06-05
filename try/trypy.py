@@ -1,14 +1,13 @@
 # encoding:utf-8
 
-class A(object):
-    name='pig'
-    @staticmethod
-    def fuck():
-        name='dog'
-        
-    @staticmethod
-    def say():
-        print(name)
+def fun1():
+    name='dog'
+    return locals()
 
-b=A()
-b.say()
+def fun2():
+    dc = locals()
+    dc.update(fun1())
+    print(name)
+
+
+fun2()
