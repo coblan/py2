@@ -1,13 +1,11 @@
 # encoding:utf-8
 
-def fun1():
-    name='dog'
-    return locals()
+class a(object):
+    def say(self):
+        print('jj')
 
-def fun2():
-    dc = locals()
-    dc.update(fun1())
-    print(name)
+class b(a):
+    pass
 
-
-fun2()
+bb=b()
+print hasattr(bb,'say')
