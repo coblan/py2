@@ -46,42 +46,57 @@ def prod():
 # Animals
 # Actresses
 # Actors"""
-tags="""Anime
-Art
-Animals
-Babies
-Cartoons
-Celebrities
-Colors
-Cute
-Disney
-Flowers
-Funny
+tags="""Movies
+Motivational
+Dogs
+Cats
 Girls
-Girly
-Illustrations
-Love
-Landscapes
+Flower
+Soccer
+Textures
 Monogram
-Movies
-Music
-Nature
+Landscapes
+Food
+Country
+Art
 Pink
-Purple
-Quotes
 Space
+USA
+Illustrations
+Cars
+Fashion
+Actresses
+Actors
+Basketball
+Black and White
+Colors
+Calendars
+Cute
+Sports
+Spiritual
+Quotes
+Nature
+Music
 TV Shows
-Sweet"""
+Love
+Holidays
+Games
+Funny
+Celebrities
+Cartoons
+Brands
+Anime
+Animals"""
 
 # bundle_id='com.ticktockapps.iphone7-wallhd-10000'
 # bundle_id='com.wallpapershdinc.pinkwallpapers-wallhd'
-bundle_id='com.ticktockapps.cutewallpapersforgirls'
+bundle_id='com.ticktockapps.wallpapers.backgrounds'
 
 tags=[tag for tag in tags.split('\n') if tag!='']
 tags=','.join(tags)
 
-# size='1080x1920'
-size='1080x1920,2048x2048'
+size='1080x1920'
+# size='1080x1920,2048x2048'
 
 def add_bundle():
     with cd(PROJECT_DIR):
