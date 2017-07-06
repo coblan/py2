@@ -1,10 +1,14 @@
 # encoding:utf-8
-
-import logging
-log=logging.getLogger('core')
+import os
+from info_util import append
+# import logging
+# log=logging.getLogger('core')
 
 import psutil
 
-mem = psutil.virtual_memory()
+cpu = psutil.cpu_times()
 
-print(mem)
+path = '../../data'
+
+cpu_csv=os.path.join(path,'cpu.csv')
+append(cpu.__dict__, cpu_csv)
