@@ -1,9 +1,6 @@
 # encoding:utf-8
 import os
 from info_util import append
-# import logging
-# log=logging.getLogger('core')
-
 import psutil
 
 cpu = psutil.cpu_times()
