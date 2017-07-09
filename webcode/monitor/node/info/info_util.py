@@ -7,9 +7,10 @@ def append(dc,path):
     dc={'date':'xxx','f1':'xx','f2':'xxx'}
     """
     try:
-        os.makedirs(os.path.dirname(path))
-    except Exception:
-        pass
+        path_dir=os.path.dirname(path)
+        os.makedirs(path_dir)
+    except Exception as e:
+        print(e)
     
     head=[key for key in dc.keys()]
     head.sort()
@@ -26,7 +27,7 @@ def append(dc,path):
             if f.readline():
                 has_header=True
 
-    with open(path,'a+b') as f:
+    with open(path,'w+b') as f:
         writer = csv.writer(f)
         if not has_header:
             writer.writerow(head)
