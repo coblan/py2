@@ -35,6 +35,9 @@ reposits=[
     # {'path':r'D:\coblan\py3','with_helpers':False},
     {'path':r'D:\coblan\web\yunwei','with_helpers':False},
     #{'path':r'D:\work\xiche','with_helpers':True}
+    {'path':r'D:\work\mywallpaper','with_helpers':False},
+    
+    {'path':r'D:\work\liucheng','with_helpers':True},
 ]
 
 def insight():
