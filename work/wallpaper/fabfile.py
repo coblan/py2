@@ -46,51 +46,36 @@ def prod():
 # Animals
 # Actresses
 # Actors"""
-tags="""Movies
-Motivational
-Dogs
-Cats
-Girls
-Flower
-Soccer
-Textures
-Monogram
-Landscapes
-Food
-Country
-Art
-Pink
-Space
-USA
-Illustrations
-Cars
-Fashion
-Actresses
-Actors
-Basketball
-Black and White
-Colors
-Calendars
-Cute
-Sports
-Spiritual
-Quotes
-Nature
-Music
-TV Shows
-Love
-Holidays
-Games
-Funny
-Celebrities
-Cartoons
-Brands
+tags="""Animals
 Anime
-Animals"""
+Art
+Blur
+Cars
+Cartoons
+Celebrities
+Colorful
+Country
+Cute
+Fashion
+Flower
+Food
+Funny
+Games
+Girls
+Landscapes
+Love
+Motivational
+Movies
+Nature
+Patterns
+Pink
+Quotes
+Space
+Sports"""
 
 # bundle_id='com.ticktockapps.iphone7-wallhd-10000'
 # bundle_id='com.wallpapershdinc.pinkwallpapers-wallhd'
-bundle_id='com.ticktockapps.wallpapers.backgrounds'
+bundle_id='com.ticktockapps.wallpapers-for-iphone'
 
 tags=[tag for tag in tags.split('\n') if tag!='']
 tags=','.join(tags)
