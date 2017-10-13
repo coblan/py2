@@ -46,6 +46,9 @@ def insight():
 def xiche():
     env['target']=[{'path':r'D:\work\xiche','with_helpers':True}]
 
+def sim():
+    env['target']=[{'path':r'D:\\try\geodjango','with_helpers':False,'src':'git@github.com:coblan/geodjango.git'}]
+
 
 def pull():
     if env.get('target'):
@@ -81,9 +84,9 @@ def pull_item(item):
                     # local('git pull')
 
 def clone_item(item):
-    # os.makedirs(item.get('path'))
     path = item.get('path')
     par = os.path.dirname(path)
+    os.makedirs(par)
     with lcd(par):
         local('git clone %(src)s'%item)
         
