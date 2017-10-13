@@ -47,7 +47,7 @@ def xiche():
     env['target']=[{'path':r'D:\work\xiche','with_helpers':True}]
 
 def sim():
-    env['target']=[{'path':r'D:\\try\geodjango','with_helpers':False,'src':'git@github.com:coblan/geodjango.git'}]
+    env['target']=[{'path':r'D:\try\geodjango','with_helpers':False,'src':'git@github.com:coblan/geodjango.git'}]
 
 
 def pull():
@@ -86,7 +86,8 @@ def pull_item(item):
 def clone_item(item):
     path = item.get('path')
     par = os.path.dirname(path)
-    os.makedirs(par)
+    if not os.path.exists(par):
+        os.makedirs(par)
     with lcd(par):
         local('git clone %(src)s'%item)
         
