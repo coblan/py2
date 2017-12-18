@@ -31,7 +31,7 @@ url="http://10.231.18.6/wgh_qp/LogicWebService/Sql/SqlHelper.asmx"
 # }
 
 proxies = {
-    'http': 'socks5://localhost:10877',
+    'http': 'socks5://121.196.197.113:10810',
 }
 
 rt=requests.post(url,headers=headers,data=body,proxies=proxies)
@@ -47,6 +47,9 @@ def parse_rt(dc):
     rt = dc2.get('Result')
     rows = rt.get('Rows')
     row = rows.get('Row')
+    return row
+
+jj= parse_rt(dc)
 print(dc)
 
 
