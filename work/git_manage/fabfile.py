@@ -25,7 +25,7 @@ PROJECT_NAME = "wallpaperv3"
 PROJECT_DIR = "/data/project/wallpaperv3/"  # project dir on server
 
 reposits=[
-    {'path':r'D:\coblan\web\insight','with_helpers':True},
+    {'path':r'D:\coblan\web\insight','with_helpers':True,'src':'git@github.com:coblan/insight.git'},
     {'path':r'D:\coblan\web\first','with_helpers':True},
     {'path':r'D:\work\insight01','with_helpers':True},
     {'path':r'D:\work\wx_case01','with_helpers':True},
