@@ -41,6 +41,7 @@ reposits=[
     {'path':r'D:\work\uihome','with_helpers':True},
     {'path':r'D:\work\liantang','with_helpers':True},
     {'path':r'D:\work\zhaoxiang','with_helpers':True},
+    {'path':r'D:\work\xuncha','with_helpers':True},
 ]
 
 def insight():
