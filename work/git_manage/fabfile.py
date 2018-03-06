@@ -37,7 +37,7 @@ reposits=[
     #{'path':r'D:\work\xiche','with_helpers':True}
     {'path':r'D:\work\mywallpaper','with_helpers':False},
     
-    {'path':r'D:\work\liucheng','with_helpers':True},
+    # {'path':r'D:\work\liucheng','with_helpers':True},
     {'path':r'D:\work\uihome','with_helpers':True},
     {'path':r'D:\work\liantang','with_helpers':True},
     {'path':r'D:\work\zhaoxiang','with_helpers':True},
