@@ -1,9 +1,10 @@
 # encoding:utf-8
-#from __future__ import unicode_literals
+from __future__ import unicode_literals
 import requests
 from bs4 import BeautifulSoup
 import re
 
+"""获取监督员case"""
 headers={
     'Cache-Control': 'max-age=0',
     'Origin': 'http://10.231.18.25',
